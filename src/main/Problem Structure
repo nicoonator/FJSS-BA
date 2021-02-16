@@ -1,1 +1,15 @@
-s
+//INFO
+#machines,#jobs,#worker,
+
+//setup requirements
+Mn: AvailableWorkers
+
+//machine requirements
+Jn: {{Machines_tn}}
+
+//processing times
+jn: {{tn1,tn2,tnm},{}}
+
+//setup times
+tn: {{st(m,w,pre(j,t)}} 
+
