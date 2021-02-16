@@ -3,8 +3,12 @@ package main;
 public class Schedule {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		Schedule.initialize();
+	}
 
+	private static void initialize() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
