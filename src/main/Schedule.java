@@ -14,46 +14,54 @@ public class Schedule {
 	public void createInstance() {
 		
 		File file = new File("Files/Example_Instance.txt");
-		int i = 1;
 		String line;
 		String[] data;
+		
+		//Phase i
+		int i = 1;
+		//Maschine m
 		int m = 1;
 		
 		try {
 			Scanner sc = new Scanner(file);
 			while (sc.hasNextLine()) {
-				System.out.println(i);
-				switch (i) {
-				case 1:
-					line=sc.nextLine();
-					data=line.split(",");
-					this.problem.setMachineCount(Integer.parseInt(data[0]));
-					this.problem.setJobCount(Integer.parseInt(data[1]));
-					this.problem.setWorkerCount(Integer.parseInt(data[2]));
-					this.problem.createWorkers();
-					break;
-				case 2:
-					while(!sc.nextLine().isBlank()) {
-						line = sc.nextLine();
-						System.out.println(line);
+				line = sc.nextLine();
+				System.out.println(line);
+				if (!line.isBlank()) {
+					switch (i) {
+					case 1:
+						data=line.split(",");
+						this.problem.setMachineCount(Integer.parseInt(data[0]));
+						this.problem.setJobCount(Integer.parseInt(data[1]));
+						this.problem.setWorkerCount(Integer.parseInt(data[2]));
+						this.problem.createWorkers();
+						this.problem.createMachines();
+						break;
+					case 2:
 						data = line.split(",");
+						for(int j=1; j<=this.problem.getWorkerCount();j++) {
+							if(checkArray(data, j)) {
+								//Add m to array of worker j
+								this.getProblem().getWorkers()[j-1].addAllowedMachine(this.problem.getMachines()[m-1]);
+							}
+						}
+						m++;
+						break;
+					case 3:
+						//System.out.println("Hallo");
+						break;
+					case 4:
+
+						break;
+					case 5:
+
+						break;
 					}
-					break;
-				case 3:
-					
-					break;
-				case 4:
-					
-					break;
-				case 5:
-					
-					break;
-				}
-				if(sc.nextLine().isBlank()) {
+				} else {
+					System.out.println(i);
 					i++;
-					sc.next();
+					
 				}
-				
 			}
 
 			sc.close();
@@ -62,6 +70,19 @@ public class Schedule {
 			System.err.println(file.getAbsolutePath());
 		}
 		
+	}
+	
+	// Checks if int i is in String[] a
+	private boolean checkArray(String[] a, int i) {
+		boolean result = false;
+		for(String s : a) {
+			if(Integer.parseInt(s)==i) {
+				result=true;
+				break;
+			}
+		}
+		
+		return result;
 	}
 
 	public ProblemDetails getProblem() {
