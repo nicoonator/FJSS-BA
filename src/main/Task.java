@@ -1,5 +1,6 @@
 package main;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Task {
@@ -9,6 +10,7 @@ public class Task {
 	
 	public Task() {
 		allowedMachines = new ArrayList<Machine>();
+		processingTimes = new HashMap <Machine, Integer>();
 	}
 	
 	public ArrayList<Machine> getAllowedMachines() {
@@ -29,6 +31,10 @@ public class Task {
 		temp = this.getAllowedMachines();
 		temp.add(m);
 		this.setAllowedMachines(temp);
+	}
+	
+	public void addProcessingTime(int time, int machine) {
+		processingTimes.put(this.getAllowedMachines().get(machine), time);
 	}
 
 }
