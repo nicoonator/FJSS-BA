@@ -7,7 +7,8 @@ public class Schedule {
 	}
 
 	private static void initialize() {
-		// TODO Auto-generated method stub
+		// TODO
+		// reads from file and creates a ProblemDetails instance
 		
 	}
 
