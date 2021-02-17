@@ -1,5 +1,10 @@
 package main;
 
-public class Machine {
+public final class Machine {
 
+	//alles final
+	//keine setters
+	public Machine() {
+		
+	}
 }
