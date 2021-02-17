@@ -7,10 +7,12 @@ public class Task {
 	
 	private ArrayList<Machine> allowedMachines;
 	private Map <Machine, Integer> processingTimes;
+	private Map <Constellation, Integer>setupTimes;
 	
 	public Task() {
 		allowedMachines = new ArrayList<Machine>();
 		processingTimes = new HashMap <Machine, Integer>();
+		setupTimes = new HashMap <Constellation, Integer>();
 	}
 	
 	public ArrayList<Machine> getAllowedMachines() {
