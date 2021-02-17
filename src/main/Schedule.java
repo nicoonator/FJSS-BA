@@ -66,7 +66,6 @@ public class Schedule {
 						k++;
 						break;
 					case 4:
-						//TODO Processing Times
 						m=1;
 						data = line.split(";");
 						for (String allowedMachines : data) {
@@ -82,6 +81,7 @@ public class Schedule {
 						break;
 					case 5:
 						//TODO Setup Times
+						data = line.split(";");
 						break;
 					}
 				} else {
