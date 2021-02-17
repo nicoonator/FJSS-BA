@@ -8,7 +8,7 @@ public class Task {
 	private Map <Machine, Integer> processingTimes;
 	
 	public Task() {
-		
+		allowedMachines = new ArrayList<Machine>();
 	}
 	
 	public ArrayList<Machine> getAllowedMachines() {
