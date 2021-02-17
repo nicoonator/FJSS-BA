@@ -1,19 +1,20 @@
 package main;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class Task {
 	
-	private Machine[] allowedMachines;
+	private ArrayList<Machine> allowedMachines;
 	private Map <Machine, Integer> processingTimes;
 	
 	public Task() {
 		
 	}
 	
-	public Machine[] getAllowedMachines() {
+	public ArrayList<Machine> getAllowedMachines() {
 		return allowedMachines;
 	}
-	public void setAllowedMachines(Machine[] allowedMachines) {
+	public void setAllowedMachines(ArrayList<Machine> allowedMachines) {
 		this.allowedMachines = allowedMachines;
 	}
 	public Map<Machine, Integer> getProcessingTimes() {
@@ -23,5 +24,11 @@ public class Task {
 		this.processingTimes = processingTimes;
 	}
 	
+	public void addAllowedMachine(Machine m) {
+		ArrayList<Machine> temp;
+		temp = this.getAllowedMachines();
+		temp.add(m);
+		this.setAllowedMachines(temp);
+	}
 
 }
