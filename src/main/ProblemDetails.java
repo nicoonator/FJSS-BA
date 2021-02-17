@@ -11,6 +11,10 @@ public class ProblemDetails {
 		
 	}
 	
+	public void createWorkers() {
+		workers = new Worker[workerCount];
+	}
+	
 	public int getMachineCount() {
 		return machineCount;
 	}
