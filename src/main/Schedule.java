@@ -23,6 +23,8 @@ public class Schedule {
 		int m = 1;
 		//Job Zeilen
 		int k = 1;
+		//Task Zeilen
+		int t = 1;
 		
 		try {
 			Scanner sc = new Scanner(file);
@@ -38,6 +40,7 @@ public class Schedule {
 						this.problem.setWorkerCount(Integer.parseInt(data[2]));
 						this.problem.createWorkers();
 						this.problem.createMachines();
+						this.problem.createJobs();
 						break;
 					case 2:
 						data = line.split(",");
@@ -51,20 +54,25 @@ public class Schedule {
 						break;
 					case 3:
 						data = line.split(";");
-						for (String t : data) {
-							
+						for (String allowedMachines : data) {
+							this.getProblem().getJobs()[k-1].addTask(new Task());
+							for (String allowedMachine : allowedMachines.split(",")) {
+								this.getProblem().getJobs()[k-1].getTasks().get(t-1).addAllowedMachine(this.getProblem().getMachines()[Integer.parseInt(allowedMachine)-1]);
+							}
+							t++;
 						}
+						t=1;
 						k++;
 						break;
 					case 4:
-
+						//TODO
 						break;
 					case 5:
-
+						//TODO
 						break;
 					}
 				} else {
-					System.out.println(i);
+					//System.out.println(i);
 					i++;
 					
 				}
