@@ -1,19 +1,31 @@
 package main;
 
+import java.util.ArrayList;
+
 public class Worker {
 
-	private int[] allowedMachines;
+	private ArrayList<Machine>  allowedMachines;
 	
 	public Worker() {
-		
+		allowedMachines = new ArrayList<Machine>();
 	}
+	
 
-	public int[] getAllowedMachines() {
+	public ArrayList<Machine> getAllowedMachines() {
 		return allowedMachines;
 	}
 
-	public void setAllowedMachines(int[] allowedMachines) {
+	public void setAllowedMachines(ArrayList<Machine> allowedMachines) {
 		this.allowedMachines = allowedMachines;
 	}
+	
+	public void addAllowedMachine(Machine m) {
+		ArrayList<Machine> temp;
+		temp = this.getAllowedMachines();
+		temp.add(m);
+		this.setAllowedMachines(temp);
+	}
+
+
 	
 }
