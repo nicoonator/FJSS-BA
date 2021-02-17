@@ -6,13 +6,25 @@ public class ProblemDetails {
 	private int workerCount;
 	private Worker[] workers;
 	private Job[] jobs;
+	private Machine[] machines;
 	
 	public ProblemDetails() {
 		
 	}
 	
+	
 	public void createWorkers() {
 		workers = new Worker[workerCount];
+		for(int i=0; i<workerCount; i++) {
+			workers[i] = new Worker();
+		}
+	}
+	
+	public void createMachines() {
+		machines = new Machine[machineCount];
+		for(int i=0; i<machineCount; i++) {
+			machines[i] = new Machine();
+		}
 	}
 	
 	public int getMachineCount() {
@@ -45,5 +57,14 @@ public class ProblemDetails {
 	public void setJobs(Job[] jobs) {
 		this.jobs = jobs;
 	}
+
+	public Machine[] getMachines() {
+		return machines;
+	}
+
+	public void setMachines(Machine[] machines) {
+		this.machines = machines;
+	}
+	
 	
 }
