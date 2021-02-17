@@ -1,15 +1,23 @@
 package main;
 
 public class Schedule {
+	
+	private ProblemDetails problem;
 
-	public static void main(String[] args) {
-		Schedule.initialize();
-	}
 
-	private static void initialize() {
+	public void createInstance() {
+		
 		// TODO
 		// reads from file and creates a ProblemDetails instance
 		
+	}
+
+	public ProblemDetails getProblem() {
+		return problem;
+	}
+
+	public void setProblem(ProblemDetails problem) {
+		this.problem = problem;
 	}
 
 }
