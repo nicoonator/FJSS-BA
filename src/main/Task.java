@@ -8,6 +8,7 @@ public class Task {
 	private ArrayList<Machine> allowedMachines;
 	private Map <Machine, Integer> processingTimes;
 	private Map <Constellation, Integer>setupTimes;
+	// private ArrayList<Constellation> connectedTasks; //Nötig? TODO
 	
 	public Task() {
 		allowedMachines = new ArrayList<Machine>();
@@ -28,6 +29,14 @@ public class Task {
 		this.processingTimes = processingTimes;
 	}
 	
+	public Map<Constellation, Integer> getSetupTimes() {
+		return setupTimes;
+	}
+
+	public void setSetupTimes(Map<Constellation, Integer> setupTimes) {
+		this.setupTimes = setupTimes;
+	}
+
 	public void addAllowedMachine(Machine m) {
 		ArrayList<Machine> temp;
 		temp = this.getAllowedMachines();
@@ -38,5 +47,11 @@ public class Task {
 	public void addProcessingTime(int time, int machine) {
 		processingTimes.put(this.getAllowedMachines().get(machine), time);
 	}
+	
+	public void addSetupTime(Machine m, Worker w, int time, Task predecessor) {
+		setupTimes.put(new Constellation(this,w,m,predecessor), time);
+	}
+	
+	
 
 }
