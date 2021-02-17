@@ -23,6 +23,7 @@ public class Schedule {
 		int m = 1;
 		//Job Zeilen
 		int k = 1;
+		int o = 1;
 		//Task Zeilen
 		int t = 1;
 		
@@ -65,10 +66,22 @@ public class Schedule {
 						k++;
 						break;
 					case 4:
-						//TODO
+						//TODO Processing Times
+						m=1;
+						data = line.split(";");
+						for (String allowedMachines : data) {
+							for (String processingTime : allowedMachines.split(",")) {
+								this.getProblem().getJobs()[o-1].getTasks().get(t-1).addProcessingTime(Integer.parseInt(processingTime),m-1);
+								m++;
+							}
+							m=1;
+							t++;
+						}
+						t=1;
+						o++;
 						break;
 					case 5:
-						//TODO
+						//TODO Setup Times
 						break;
 					}
 				} else {
