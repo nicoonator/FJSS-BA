@@ -6,6 +6,10 @@ public class Task {
 	private Machine[] allowedMachines;
 	private Map <Machine, Integer> processingTimes;
 	
+	public Task() {
+		
+	}
+	
 	public Machine[] getAllowedMachines() {
 		return allowedMachines;
 	}
