@@ -7,6 +7,10 @@ public class ProblemDetails {
 	private Worker[] workers;
 	private Job[] jobs;
 	
+	public ProblemDetails() {
+		
+	}
+	
 	public int getMachineCount() {
 		return machineCount;
 	}
