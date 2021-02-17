@@ -81,7 +81,7 @@ public class Schedule {
 						break;
 					case 5:
 						//TODO Setup Times
-						data = line.split(";");
+						
 						break;
 					}
 				} else {
