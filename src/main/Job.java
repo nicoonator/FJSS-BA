@@ -1,14 +1,16 @@
 package main;
 
+import java.util.ArrayList;
+
 public class Job {
 	
-	private Task[] tasks;
+	private ArrayList<Task> tasks;
 
-	public Task[] getTasks() {
+	public ArrayList<Task> getTasks() {
 		return tasks;
 	}
 
-	public void setTasks(Task[] tasks) {
+	public void setTasks(ArrayList<Task> tasks) {
 		this.tasks = tasks;
 	}
 
