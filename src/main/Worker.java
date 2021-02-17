@@ -3,6 +3,10 @@ package main;
 public class Worker {
 
 	private int[] allowedMachines;
+	
+	public Worker() {
+		
+	}
 
 	public int[] getAllowedMachines() {
 		return allowedMachines;
