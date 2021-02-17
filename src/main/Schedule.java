@@ -19,14 +19,16 @@ public class Schedule {
 		
 		//Phase i
 		int i = 1;
-		//Maschine m
+		//Maschine Zeilen
 		int m = 1;
+		//Job Zeilen
+		int k = 1;
 		
 		try {
 			Scanner sc = new Scanner(file);
 			while (sc.hasNextLine()) {
 				line = sc.nextLine();
-				System.out.println(line);
+				//System.out.println(line);
 				if (!line.isBlank()) {
 					switch (i) {
 					case 1:
@@ -48,7 +50,11 @@ public class Schedule {
 						m++;
 						break;
 					case 3:
-						//System.out.println("Hallo");
+						data = line.split(";");
+						for (String t : data) {
+							
+						}
+						k++;
 						break;
 					case 4:
 
