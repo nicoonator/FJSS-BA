@@ -24,8 +24,12 @@ public class Schedule {
 		//Job Zeilen
 		int k = 1;
 		int o = 1;
+		int job = 1;
 		//Task Zeilen
 		int t = 1;
+		int task = 1;
+		//Worker Zeilen
+		int w = 1;
 		
 		try {
 			Scanner sc = new Scanner(file);
@@ -81,13 +85,31 @@ public class Schedule {
 						break;
 					case 5:
 						//TODO Setup Times
+						data = line.split(";");
+						// job -> Ende Ermittlen
+						// Task -> Zeile (for Schleife)
+						//Machine 
+						//Worker w
+						//Nächster Task Ermitteln TODO
+						//Iteration durch alle Tasks zur Bestimmung des Vorgängertasks(
+						for (Job jo : this.getProblem().getJobs()) {
+							for (Task taski : jo.getTasks()) {
+								//ist der Task relevant? 
+								if(isRelevant(taski,job, task)) {
+									//TODO
+								}
+							}
+						}
+						
+						//setupTime zuweisen
+						for (String s : data) {
+							this.getProblem().getJobs()[job].getTasks().get(task).addSetupTime(this.getProblem().getMachines()[m-1], this.getProblem().getWorkers()[w-1], Integer.parseInt(s), vorgängertask/* TODO TASK*/);
+						}
 						
 						break;
 					}
 				} else {
-					//System.out.println(i);
 					i++;
-					
 				}
 			}
 
@@ -99,6 +121,16 @@ public class Schedule {
 		
 	}
 	
+	private boolean isRelevant(Task taski, int job, int task) {
+		// TODO Auto-generated method stub
+		boolean result = false;
+		/* Ein Task is relevant, wenn
+		 * Er nicht im selben Job an späterer Reihenfolge stattfinden soll
+		 * Es eine Maschine gibt, die beide Tasks bearbeiten kann
+		 */
+		return result;
+	}
+
 	// Checks if int i is in String[] a
 	private boolean checkArray(String[] a, int i) {
 		boolean result = false;
