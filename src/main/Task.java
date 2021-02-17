@@ -1,10 +1,10 @@
 package main;
-import java.util.HashMap;
+import java.util.Map;
 
 public class Task {
 	
 	private Machine[] allowedMachines;
-	private HashMap <Machine, Integer> processingTimes;
+	private Map <Machine, Integer> processingTimes;
 	
 	public Machine[] getAllowedMachines() {
 		return allowedMachines;
@@ -12,10 +12,10 @@ public class Task {
 	public void setAllowedMachines(Machine[] allowedMachines) {
 		this.allowedMachines = allowedMachines;
 	}
-	public HashMap<Machine, Integer> getProcessingTimes() {
+	public Map<Machine, Integer> getProcessingTimes() {
 		return processingTimes;
 	}
-	public void setProcessingTimes(HashMap<Machine, Integer> processingTimes) {
+	public void setProcessingTimes(Map<Machine, Integer> processingTimes) {
 		this.processingTimes = processingTimes;
 	}
 	
