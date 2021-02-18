@@ -52,6 +52,10 @@ public class Task {
 		setupTimes.put(new Constellation(this,w,m,predecessor), time);
 	}
 	
+	public void addSetupTime(Constellation c, int time) {
+		setupTimes.put(c, time);
+	}
+	
 	
 
 }
