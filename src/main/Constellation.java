@@ -20,6 +20,7 @@ public class Constellation {
 		this.task = task;
 		this.worker = worker;
 		this.machine = machine;
+		this.predecessor = null;
 		}
 	
 	public Task getTask() {
