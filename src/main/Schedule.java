@@ -3,7 +3,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import Exceptions.ConstellationException;
+
 public class Schedule {
+	
+	// Blockzaehler
+	private int blockzaehler = 0;
+	private	int maschinenzaehler = 1;
+	private	int workerzaehler = 1;
 	
 	private ProblemDetails problem;
 
@@ -30,6 +37,12 @@ public class Schedule {
 		int task = 1;
 		//Worker Zeilen
 		int w = 1;
+		
+		// Zählvariablen
+		int a = 1;
+		int b = 1;
+		
+		
 		
 		try {
 			Scanner sc = new Scanner(file);
@@ -86,6 +99,38 @@ public class Schedule {
 					case 5:
 						//TODO Setup Times
 						data = line.split(";");
+						/* 
+						 * Jede Zeile steht für die setuptimes eines Tasks
+						 * Tasks muss als Variable getrackt werden um diese bei der nächsten Zeile zu erhöhen
+						 * Zeile Besteht aus Blöcken (für Einrichter auf Maschine)
+						 * Erster Eintrag im Block steht immer fuer die 0,0 Zeit
+						 * Danach Schrittweise alle Relevanten Tasks. 
+						 * Wenn keine Task mehr Relevant --> nächster Block
+						*/
+						
+						//ermittler Aktuellen Task der Zeile
+						Task aktuellerTask = this.getProblem().getJobs()[a-1].getTasks().get(b-1);
+						for (String i1 : data) {
+							int	setuptime = Integer.parseInt(i1);
+							Constellation constellation = this.getNextConstellation(aktuellerTask,blockzaehler);
+							this.iteratePosition();
+							if (constellation != null) {
+								Worker worker = constellation.getWorker();
+								Task predecessor = constellation.getPredecessor();
+								Machine machine = constellation.getMachine();
+								blockzaehler++;
+								if (predecessor == null) {
+									// Wenn 0,0 Vorgänger ist
+									this.addSetupTime(constellation, setuptime);
+								} else {
+									// Jeder andere Vorgänger
+									this.addSetupTime(constellation, setuptime);
+								}
+							} else blockzaehler = 1;
+						}
+						
+						
+						
 						// job -> Ende Ermittlen
 						// Task -> Zeile (for Schleife)
 						//Machine 
@@ -93,19 +138,28 @@ public class Schedule {
 						//Nächster Task Ermitteln TODO
 						//Iteration durch alle Tasks zur Bestimmung des Vorgängertasks(
 						for (Job jo : this.getProblem().getJobs()) {
+							//Erster Vorgängertask ist 0,0
+							//TODO
+							
+							
 							for (Task taski : jo.getTasks()) {
 								//ist der Task relevant? 
 								if(isRelevant(taski,job, task)) {
 									//TODO
+									//setupTime zuweisen
+									this.addSetupTime(job, task, m, w, Integer.parseInt(data[it]), taski);
 								}
 							}
 						}
 						
 						//setupTime zuweisen
-						for (String s : data) {
-							this.getProblem().getJobs()[job].getTasks().get(task).addSetupTime(this.getProblem().getMachines()[m-1], this.getProblem().getWorkers()[w-1], Integer.parseInt(s), vorgängertask/* TODO TASK*/);
-						}
 						
+						/*
+						for (String s : data) {
+							this.getProblem().getJobs()[job].getTasks().get(task).addSetupTime(this.getProblem().getMachines()[m-1], this.getProblem().getWorkers()[w-1], Integer.parseInt(s), vorgängertask);
+						}
+						*/
+					
 						break;
 					}
 				} else {
@@ -117,10 +171,32 @@ public class Schedule {
 		} catch (FileNotFoundException e) {
 			System.out.println("File not Found!");
 			System.err.println(file.getAbsolutePath());
+		} catch (ConstellationException e) {
+			System.out.println(e.getMessage());
 		}
 		
 	}
 	
+	
+	private void iteratePosition() {
+		this		
+	}
+
+	private Constellation getNextConstellation(Task aktuellerTask, int blockzaehler) {
+		// Hier muessen predecessor, Worker und Maschine, die als naechstes dran sind bestimmt werden
+		if(blockzaehler==1) {
+			
+			return new Constellation()
+		} else {
+			
+			return new Constellation()
+		}
+		
+		throw new ConstellationException("No constellation Found");
+		return null;
+	}
+	
+	//Notwendig?
 	private boolean isRelevant(Task taski, int job, int task) {
 		// TODO Auto-generated method stub
 		boolean result = false;
@@ -142,6 +218,20 @@ public class Schedule {
 		}
 		
 		return result;
+	}
+	
+	private void addSetupTime(Constellation constellation, int time) {
+		//pointer / Referenz?
+		Task task = constellation.getTask();
+		
+		for (int job=0;job<this.getProblem().getJobCount();job++) {
+			for (int task1 = 0; task1<this.getProblem().getJobs()[job].getTasks().size();task1++) {
+				if (this.getProblem().getJobs()[job].getTasks().get(task1) == task) {
+					this.getProblem().getJobs()[job].getTasks().get(task1).addSetupTime(constellation, time);
+					return;
+				}
+			}
+		}
 	}
 
 	public ProblemDetails getProblem() {
