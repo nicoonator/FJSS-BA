@@ -8,6 +8,7 @@ public class Task {
 	private ArrayList<Machine> allowedMachines;
 	private Map <Machine, Integer> processingTimes;
 	private Map <Constellation, Integer>setupTimes;
+	private int taskNumber;
 	// private ArrayList<Constellation> connectedTasks; //Nötig? TODO
 	
 	public Task() {
@@ -54,6 +55,14 @@ public class Task {
 	
 	public void addSetupTime(Constellation c, int time) {
 		setupTimes.put(c, time);
+	}
+
+	public int getTaskNumber() {
+		return taskNumber;
+	}
+
+	public void setTaskNumber(int taskNumber) {
+		this.taskNumber = taskNumber;
 	}
 	
 	
