@@ -2,12 +2,12 @@ package main;
 
 public class Constellation {
 
-	final private Task task;
+	final private int task;
 	final private Worker worker;
 	final private Machine machine;
-	final private Task predecessor;
+	final private int predecessor;
 	
-	public Constellation(Task task, Worker worker, Machine machine, Task predecessor) {
+	public Constellation(int task, Worker worker, Machine machine, int predecessor) {
 		super();
 		this.task = task;
 		this.worker = worker;
@@ -15,15 +15,15 @@ public class Constellation {
 		this.predecessor = predecessor;
 	}
 	
-	public Constellation(Task task, Worker worker, Machine machine) {
+	public Constellation(int task, Worker worker, Machine machine) {
 		super();
 		this.task = task;
 		this.worker = worker;
 		this.machine = machine;
-		this.predecessor = null;
+		this.predecessor = -1;
 		}
 	
-	public Task getTask() {
+	public int getTask() {
 		return task;
 	}
 
@@ -35,7 +35,7 @@ public class Constellation {
 		return machine;
 	}
 
-	public Task getPredecessor() {
+	public int getPredecessor() {
 		return predecessor;
 	}
 
