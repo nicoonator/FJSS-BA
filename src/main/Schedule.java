@@ -24,6 +24,8 @@ public class Schedule {
 	private Worker nextWorker;
 
 	private ProblemDetails problem;
+	
+	boolean check = true;
 
 	public Schedule() {
 		problem = new ProblemDetails();
@@ -44,8 +46,8 @@ public class Schedule {
 		int o = 1;
 		// Task Zeilen
 		int t = 1;
-		// Worker Zeilen
-
+		int taskNumber = 0;
+		
 		try {
 			Scanner sc = new Scanner(file);
 			while (sc.hasNextLine()) {
@@ -76,7 +78,8 @@ public class Schedule {
 					case 3:
 						data = line.split(";");
 						for (String allowedMachines : data) {
-							this.getProblem().getJobs()[k - 1].addTask(new Task());
+							this.getProblem().getJobs()[k - 1].addTask(new Task(taskNumber));
+							taskNumber++;
 							for (String allowedMachine : allowedMachines.split(",")) {
 								this.getProblem().getJobs()[k - 1].getTasks().get(t - 1).addAllowedMachine(
 										this.getProblem().getMachines()[Integer.parseInt(allowedMachine) - 1]);
@@ -143,10 +146,39 @@ public class Schedule {
 	}
 
 	private void updateRelevantData(Task aktuellerTask) {
+		updateMachines(aktuellerTask);
+		updateWorkers(aktuellerTask);
+		updateTasks(aktuellerTask);
+		/*
 		relevantMachines = this.getRelevantMachines(aktuellerTask);
 		relevantWorkers = this.getRelevantWorkers(aktuellerTask);
 		relevantTasks= this.getRelevantTasks(aktuellerTask);
+		*/
 		updateNext();
+	}
+
+	private void updateTasks(Task aktuellerTask) {
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		for(Task t: this.getRelevantTasks(aktuellerTask)) {
+			tasks.add(t);
+		}
+		relevantTasks = tasks;
+	}
+
+	private void updateWorkers(Task aktuellerTask) {
+		ArrayList<Worker> workers = new ArrayList<Worker>();
+		for(Worker w: this.getRelevantWorkers(aktuellerTask)) {
+			workers.add(w);
+		}
+		relevantWorkers = workers;
+	}
+
+	private void updateMachines(Task aktuellerTask) {
+		ArrayList<Machine> machines = new ArrayList<Machine>();
+		for(Machine m: this.getRelevantMachines(aktuellerTask)) {
+			machines.add(m);
+		}
+		relevantMachines=machines;
 	}
 
 	private void updateNext() {
@@ -237,6 +269,22 @@ public class Schedule {
 
 	private void iteratePosition(Task task) {
 		
+		
+		//TODO DEBUG
+		
+		if (relevantTasks.size() > 1) {
+			relevantTasks.remove(0);
+		} else if (relevantWorkers.size() > 1) {
+			relevantWorkers.remove(0);
+			getRelevantTasks(task);
+		} else if(relevantMachines.size() > 1) {
+			relevantMachines.remove(0);
+			getRelevantTasks(task);
+			getRelevantWorkers(task);
+		} else blockzaehler = 0;
+		updateNext();
+		
+		/**
 		if (relevantMachines.size() > 1) {
 			relevantMachines.remove(0);
 			getRelevantTasks(task);
@@ -248,7 +296,7 @@ public class Schedule {
 			relevantTasks.remove(0);
 		} else blockzaehler = 0;
 		updateNext();
-		
+		**/
 		
 	}
 
@@ -257,9 +305,9 @@ public class Schedule {
 		Constellation result = null; 
 				
 		if(blockzaehler==1) {
-			result = new Constellation(aktuellerTask,nextWorker,nextMachine);
+			result = new Constellation(aktuellerTask.getTaskNumber(),nextWorker,nextMachine);
 		} else if (!relevantTasks.isEmpty()) {
-			result = new Constellation(aktuellerTask,nextWorker,nextMachine,nextTask);
+			result = new Constellation(aktuellerTask.getTaskNumber(),nextWorker,nextMachine,nextTask.getTaskNumber());
 			this.iteratePosition(aktuellerTask); 
 		}
 		
@@ -283,16 +331,33 @@ public class Schedule {
 
 	private void addSetupTime(Constellation constellation, int time) {
 		// pointer / Referenz?
-		Task task = constellation.getTask();
-
+		int tasknumber = constellation.getTask();
+		Task task = getTaskByTasknumber(tasknumber);
+		task.addSetupTime(constellation, time);
+		/*
 		for (int job = 0; job < this.getProblem().getJobCount(); job++) {
 			for (int task1 = 0; task1 < this.getProblem().getJobs()[job].getTasks().size(); task1++) {
-				if (this.getProblem().getJobs()[job].getTasks().get(task1) == task) {
+				if (this.getProblem().getJobs()[job].getTasks().get(task1).getTaskNumber() == tasknumber) {
 					this.getProblem().getJobs()[job].getTasks().get(task1).addSetupTime(constellation, time);
 					return;
 				}
 			}
 		}
+		*/
+	}
+
+	private Task getTaskByTasknumber(int tasknumber) {
+		Task result = null;
+		
+		for (Job job : this.getProblem().getJobs()) {
+			for (Task task : job.getTasks()) {
+				if (task.getTaskNumber()==tasknumber) {
+					return task;
+				}
+			}
+		}
+		
+		return result;
 	}
 
 	public Job getJob(Task task) {
