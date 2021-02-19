@@ -26,29 +26,19 @@ public class Constellation {
 	public Task getTask() {
 		return task;
 	}
-	public void setTask(Task task) {
-		this.task = task;
-	}
+
 	public Worker getWorker() {
 		return worker;
 	}
-	public void setWorker(Worker worker) {
-		this.worker = worker;
-	}
+
 	public Machine getMachine() {
 		return machine;
-	}
-	public void setMachine(Machine machine) {
-		this.machine = machine;
 	}
 
 	public Task getPredecessor() {
 		return predecessor;
 	}
 
-	public void setPredecessor(Task predecessor) {
-		this.predecessor = predecessor;
-	}
 	
 	
 	
