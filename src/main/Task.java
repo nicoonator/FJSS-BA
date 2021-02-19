@@ -11,10 +11,11 @@ public class Task {
 	private int taskNumber;
 	// private ArrayList<Constellation> connectedTasks; //Nötig? TODO
 	
-	public Task() {
+	public Task(int taskNumber2) {
 		allowedMachines = new ArrayList<Machine>();
 		processingTimes = new HashMap <Machine, Integer>();
 		setupTimes = new HashMap <Constellation, Integer>();
+		taskNumber=taskNumber2;
 	}
 	
 	public ArrayList<Machine> getAllowedMachines() {
@@ -47,10 +48,6 @@ public class Task {
 	
 	public void addProcessingTime(int time, int machine) {
 		processingTimes.put(this.getAllowedMachines().get(machine), time);
-	}
-	
-	public void addSetupTime(Machine m, Worker w, int time, Task predecessor) {
-		setupTimes.put(new Constellation(this,w,m,predecessor), time);
 	}
 	
 	public void addSetupTime(Constellation c, int time) {
