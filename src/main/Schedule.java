@@ -5,23 +5,15 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import Exceptions.ConstellationException;
-
 public class Schedule {
 
 	// Blockzaehler
 	private int blockzaehler = 1;
-	private int maschinenzaehler = 1;
-	private int workerzaehler = 1;
-	private int taskzaehler = 1;
-	private int jobzaehler = 1;
 	// Zählvariablen
 	private int a = 1;
 	private int b = 1;
-	
-	private int masch = 1;
-	private int work = 1;
-	private int task1 = 1;
+		
+	private int masch = 0;
 
 	private ArrayList<Task> relevantTasks;
 	private ArrayList<Machine> relevantMachines;
@@ -50,12 +42,9 @@ public class Schedule {
 		// Job Zeilen
 		int k = 1;
 		int o = 1;
-		int job = 1;
 		// Task Zeilen
 		int t = 1;
-		int task = 1;
 		// Worker Zeilen
-		int w = 1;
 
 		try {
 			Scanner sc = new Scanner(file);
@@ -113,7 +102,6 @@ public class Schedule {
 						o++;
 						break;
 					case 5:
-						// TODO Setup Times
 						data = line.split(",");
 						/*
 						 * Jede Zeile steht für die setuptimes eines Tasks Tasks muss als Variable
@@ -128,24 +116,14 @@ public class Schedule {
 						this.updateRelevantData(aktuellerTask);						
 						for (String i1 : data) {
 							int setuptime = Integer.parseInt(i1);
-							Constellation constellation = this.getNextConstellation(aktuellerTask, blockzaehler);
+							Constellation constellation = this.getNextConstellation(aktuellerTask, blockzaehler);							
 							if (constellation != null) {
-								Worker worker = constellation.getWorker();
-								Task predecessor = constellation.getPredecessor();
-								Machine machine = constellation.getMachine();
+								this.addSetupTime(constellation, setuptime);
 								blockzaehler++;
-								if (predecessor == null) {
-									// Wenn 0,0 Vorgänger ist
-									this.addSetupTime(constellation, setuptime);
-								} else {
-									// Jeder andere Vorgänger
-									this.addSetupTime(constellation, setuptime);
-								}
-							} else
-								blockzaehler = 1;
+							} 
 						}
 
-						this.getNextTask();
+						this.getNextTask(aktuellerTask);
 
 						break;
 					}
@@ -165,16 +143,22 @@ public class Schedule {
 	}
 
 	private void updateRelevantData(Task aktuellerTask) {
-		relevantTasks= this.getRelevantTasks(aktuellerTask);
 		relevantMachines = this.getRelevantMachines(aktuellerTask);
 		relevantWorkers = this.getRelevantWorkers(aktuellerTask);
+		relevantTasks= this.getRelevantTasks(aktuellerTask);
 		updateNext();
 	}
 
 	private void updateNext() {
-		nextTask = relevantTasks.get(0);
-		nextMachine = relevantMachines.get(0);
-		nextWorker = relevantWorkers.get(0);
+		if (relevantTasks.size()>0) {
+			nextTask = relevantTasks.get(0);
+		}
+		if (relevantMachines.size()>0) {
+			nextMachine = relevantMachines.get(0);
+		}
+		if (relevantWorkers.size()>0) {
+			nextWorker = relevantWorkers.get(0);
+		}
 	}
 
 	private ArrayList<Machine> getRelevantMachines(Task aktuellerTask) {
@@ -205,7 +189,9 @@ public class Schedule {
 				if (task != aktuellerTask) {
 					if (hasCommonMachines(task, aktuellerTask)) {
 						if (isPreceeding(task, aktuellerTask)) {
-							result.add(task);
+							if (task.getAllowedMachines().contains(aktuellerTask.getAllowedMachines().get(masch))) {
+								result.add(task);
+							}
 						}
 					}
 				}
@@ -240,10 +226,10 @@ public class Schedule {
 		return result;
 	}
 
-	private void getNextTask() {
-		if (b < this.getProblem().getJobs()[jobzaehler].getTasks().size() - 1) {
+	private void getNextTask(Task aktuellerTask) {
+		if (b < getJob(aktuellerTask).getTasks().size()) {
 			b++;
-		} else if (a < this.getProblem().getJobs().length - 1) {
+		} else if (a < this.getProblem().getJobs().length) {
 			a++;
 			b = 1;
 		}
@@ -275,21 +261,31 @@ public class Schedule {
 			blockzaehler = 1;
 		}
 		*/
-		if(!relevantTasks.isEmpty()) {
+		if (relevantMachines.size() > 1) {
+			relevantMachines.remove(0);
+			getRelevantTasks(task);
+			getRelevantWorkers(task);
+		} else if (relevantWorkers.size() > 1) {
+			relevantWorkers.remove(0);
+			getRelevantTasks(task);
+		} else if (relevantTasks.size() > 1) {
 			relevantTasks.remove(0);
-		}
+		} else blockzaehler = 0;
 		updateNext();
-	}
-
-	private boolean isAllowedMachine(Task task) {
-		boolean result = false;
-
-		ArrayList<Machine> machines = task.getAllowedMachines();
-		if (machines.contains(this.getProblem().getMachines()[maschinenzaehler - 1])) {
-			result = true;
-		}
-
-		return result;
+		
+		/*
+		if (relevantTasks.size() > 1) {
+			relevantTasks.remove(0);
+		} else if (relevantWorkers.size() > 1) {
+			relevantWorkers.remove(0);
+			getRelevantTasks(task);
+		} else if (relevantMachines.size() > 1) {
+			relevantMachines.remove(0);
+			getRelevantTasks(task);
+			getRelevantWorkers(task);
+		} else blockzaehler = 0;
+		updateNext();
+		*/
 	}
 
 	
@@ -336,59 +332,8 @@ public class Schedule {
 		 * 
 		 * return result; }
 		 */
-	 
-
-	private void gotoNextRelevantTask(Task task) {
-		while (!isRelevant(task)) {
-			iteratePosition(task);
-		}
-		return;
-	}
-
-	private boolean isRelevant(Task task) {
-		// Hierbei ist task der aktuelle Task! Der Vergleichstask wird mithilfe der
-		// lokalen Variablen ermittelt
-		boolean result = false;
-		/*
-		 * Ein Task is relevant, wenn Er nicht im selben Job an späterer Reihenfolge
-		 * stattfinden soll Es eine Maschine gibt, die beide Tasks bearbeiten kann
-		 */
-		boolean machine = false;
-		boolean jobtracker = true;
-
-		// gesucht sind nicht gemeinsame Maschinen, sondern ob Maschine in
-		// maschinenzaehler gemeinsam ist
-		/*
-		 * ArrayList<Machine> listA = new ArrayList<>(task.getAllowedMachines());
-		 * ArrayList<Machine> listB = new
-		 * ArrayList<>(this.getProblem().getJobs()[jobzaehler-1].getTasks().get(
-		 * taskzaehler-1).getAllowedMachines()); listA.retainAll(listB);
-		 * 
-		 * if (listA.size()!=0) { machine = true; } else return result;
-		 */
-
-		Machine machineA = this.getProblem().getJobs()[a - 1].getTasks().get(b - 1).getAllowedMachines()
-				.get(maschinenzaehler - 1);
-
-		if (this.getProblem().getJobs()[jobzaehler - 1].getTasks().get(taskzaehler - 1).getAllowedMachines()
-				.contains(machineA)) {
-			machine = true;
-		} else
-			return result;
-
-		if (this.getJob(task) == this.getProblem().getJobs()[jobzaehler - 1]) {
-			if (this.getJob(task).getTasks().indexOf(task) < taskzaehler - 1) {
-				jobtracker = false;
-			}
-		}
-
-		if (machine && jobtracker) {
-			result = true;
-		}
-
-		return result;
-	}
-
+	
+	
 	// Checks if int i is in String[] a
 	private boolean checkArray(String[] a, int i) {
 		boolean result = false;
