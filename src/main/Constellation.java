@@ -2,10 +2,10 @@ package main;
 
 public class Constellation {
 
-	private Task task;
-	private Worker worker;
-	private Machine machine;
-	private Task predecessor;
+	final private Task task;
+	final private Worker worker;
+	final private Machine machine;
+	final private Task predecessor;
 	
 	public Constellation(Task task, Worker worker, Machine machine, Task predecessor) {
 		super();
