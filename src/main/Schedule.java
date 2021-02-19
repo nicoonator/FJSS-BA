@@ -214,6 +214,8 @@ public class Schedule {
 		return result;
 	}
 
+	
+	//TODO DEBUG Variable: masch
 	private ArrayList<Task> getRelevantTasks(Task aktuellerTask) {
 		ArrayList<Task> result = new ArrayList<Task>();
 		for (Job job : this.getProblem().getJobs()) {
