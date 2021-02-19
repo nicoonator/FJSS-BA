@@ -236,31 +236,7 @@ public class Schedule {
 	}
 
 	private void iteratePosition(Task task) {
-		// Hier muessen predecessor, Worker und Maschine, die als naechstes dran sind
-		// bestimmt werden
-		/*
-		if (taskzaehler < this.getProblem().getJobs()[jobzaehler - 1].getTasks().size()) {
-			taskzaehler++;
-		} else if (jobzaehler < this.getProblem().getJobs().length) {
-			jobzaehler++;
-			taskzaehler = 1;
-		} else if (workerzaehler < this.getProblem().getWorkerCount()) {
-			jobzaehler = 1;
-			taskzaehler = 1;
-			workerzaehler++;
-		} else if (isAllowedMachine(task)) {
-			jobzaehler = 1;
-			taskzaehler = 1;
-			workerzaehler = 1;
-			maschinenzaehler++;
-		} else {
-			jobzaehler = 1;
-			taskzaehler = 1;
-			workerzaehler = 1;
-			maschinenzaehler = 1;
-			blockzaehler = 1;
-		}
-		*/
+		
 		if (relevantMachines.size() > 1) {
 			relevantMachines.remove(0);
 			getRelevantTasks(task);
@@ -273,34 +249,13 @@ public class Schedule {
 		} else blockzaehler = 0;
 		updateNext();
 		
-		/*
-		if (relevantTasks.size() > 1) {
-			relevantTasks.remove(0);
-		} else if (relevantWorkers.size() > 1) {
-			relevantWorkers.remove(0);
-			getRelevantTasks(task);
-		} else if (relevantMachines.size() > 1) {
-			relevantMachines.remove(0);
-			getRelevantTasks(task);
-			getRelevantWorkers(task);
-		} else blockzaehler = 0;
-		updateNext();
-		*/
+		
 	}
 
 	
-	private Constellation getNextConstellation(Task aktuellerTask, int blockzaehler) { //throws ConstellationException {
-
+	private Constellation getNextConstellation(Task aktuellerTask, int blockzaehler) { 
 		Constellation result = null; 
-		/*
-		if(blockzaehler==1) { 
-			result = new Constellation(aktuellerTask, this.getProblem().getWorkers()[workerzaehler-1],this.getProblem().getMachines()[maschinenzaehler-1]);
-			this.iteratePosition(aktuellerTask); 
-		} else if (existsNextRelevantTask(aktuellerTask)) {
-			gotoNextRelevantTask(aktuellerTask); result = new Constellation(aktuellerTask, this.getProblem().getWorkers()[workerzaehler-1],this.getProblem().getMachines()[maschinenzaehler-1],this.getProblem().getJobs()[jobzaehler-1].getTasks().get(taskzaehler-1));
-			this.iteratePosition(aktuellerTask); 
-		} */
-		
+				
 		if(blockzaehler==1) {
 			result = new Constellation(aktuellerTask,nextWorker,nextMachine);
 		} else if (!relevantTasks.isEmpty()) {
@@ -311,28 +266,7 @@ public class Schedule {
 		return result; 
 	}
 	  
-	  // throw new ConstellationException("No constellation Found"); }
 	 
-
-	
-		/*
-		 * private boolean existsNextRelevantTask(Task aktuellerTask) { boolean result =
-		 * false;
-		 * 
-		 * ArrayList<Machine> machines = new
-		 * ArrayList<Machine>(aktuellerTask.getAllowedMachines()); ArrayList<Task> tasks
-		 * = new ArrayList<Task>();
-		 * 
-		 * for(Job job : this.getProblem().getJobs()) { for(Task task : job.getTasks())
-		 * { if(this.getJob(task)==this.getProblem().getJobs()[jobzaehler-1] &&
-		 * this.getJob(task).getTasks().indexOf(task)<taskzaehler-1) { // WENN der Job
-		 * Vorgänger sein kann if() } } }
-		 * 
-		 * if(!tasks.isEmpty()) { result=true; }
-		 * 
-		 * return result; }
-		 */
-	
 	
 	// Checks if int i is in String[] a
 	private boolean checkArray(String[] a, int i) {
