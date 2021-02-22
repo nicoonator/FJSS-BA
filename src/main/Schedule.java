@@ -14,10 +14,12 @@ public class Schedule {
 	private int b = 1;
 		
 	private int masch = 0;
+	private int work = 0;
 
 	private ArrayList<Task> relevantTasks;
 	private ArrayList<Machine> relevantMachines;
 	private ArrayList<Worker> relevantWorkers;
+	private ArrayList<Constellation> relevantConstellations;
 	
 	private Task nextTask;
 	private Machine nextMachine;
@@ -71,6 +73,7 @@ public class Schedule {
 								// Add m to array of worker j
 								this.getProblem().getWorkers()[j - 1]
 										.addAllowedMachine(this.problem.getMachines()[m - 1]);
+								this.getProblem().getMachines()[m-1].addAllowedWorker(this.getProblem().getWorkers()[j-1]);
 							}
 						}
 						m++;
@@ -116,7 +119,8 @@ public class Schedule {
 
 						// ermittler Aktuellen Task der Zeile
 						Task aktuellerTask = this.getProblem().getJobs()[a - 1].getTasks().get(b - 1);
-						this.updateRelevantData(aktuellerTask);						
+						this.updateRelevantData(aktuellerTask);		
+						relevantConstellations = this.getRelevantConstellations(aktuellerTask);
 						for (String i1 : data) {
 							int setuptime = Integer.parseInt(i1);
 							Constellation constellation = this.getNextConstellation(aktuellerTask, blockzaehler);							
@@ -143,6 +147,58 @@ public class Schedule {
 			 * catch (ConstellationException e) { System.out.println(e.getMessage()); }
 			 */
 
+	}
+
+	private ArrayList<Constellation> getRelevantConstellations(Task aktuellerTask) {
+		ArrayList<Constellation> result = new ArrayList<Constellation>();
+		
+
+		
+		// Erster Worker und erste Maschine des Tasks holen
+		for (Machine m : aktuellerTask.getAllowedMachines()) {
+			for (Worker w : m.getAllowedWorkers()) {
+				result.add(new Constellation(aktuellerTask.getTaskNumber(),w,m));
+				for (Task pre : this.getRelevantTasks(aktuellerTask, m)) {
+					result.add(new Constellation(aktuellerTask.getTaskNumber(),w,m,pre.getTaskNumber()));
+				} 
+			}
+		}
+		
+		
+		return result;
+	}
+
+	// Alle Tasks die auf der Maschine m ausgeführt werden können und nicht nach dem Aktuellen Task kommen
+	private ArrayList<Task> getRelevantTasks(Task aktuellerTask, Machine m) {
+		ArrayList<Task> result = new ArrayList<Task>();
+		
+		// Alle Tasks die auf der Maschine m ausgeführt werden können
+		for (Task t : this.getAllTasks()) {
+			if (t.getAllowedMachines().contains(m)){
+				//Wenn der Tasks  auf dem Selben Job an früherer Position kommt
+				if(t.getJobNumber() == aktuellerTask.getJobNumber()) {
+					if (t.getTaskNumber() < aktuellerTask.getTaskNumber()) {
+						result.add(t);
+					}
+				} else {
+					result.add(t);
+				}
+			}
+		}
+		
+		return result;
+	}
+
+	private ArrayList<Task> getAllTasks() {
+		ArrayList<Task> result = new ArrayList<Task>();
+		
+		for(Job j : this.getProblem().getJobs()) {
+			for (Task t : j.getTasks()) {
+				result.add(t);
+			}
+		}
+		
+		return result;
 	}
 
 	private void updateRelevantData(Task aktuellerTask) {
@@ -200,14 +256,16 @@ public class Schedule {
 	}
 
 	private ArrayList<Worker> getRelevantWorkers(Task aktuellerTask) {
+		
+		// TODO DEBUG
 		ArrayList<Worker> result = new ArrayList<Worker>();
+		
 		
 		for(Worker w: this.getProblem().getWorkers()) {
 			for (Machine m: w.getAllowedMachines()) {
-				if (aktuellerTask.getAllowedMachines().contains(m)) {
+				if (aktuellerTask.getAllowedMachines().get(masch).getMachineNumber() == m.getMachineNumber()) {
 					result.add(w);
-					break;
-				}
+				} 
 			}
 		}
 		
@@ -215,7 +273,6 @@ public class Schedule {
 	}
 
 	
-	//TODO DEBUG Variable: masch
 	private ArrayList<Task> getRelevantTasks(Task aktuellerTask) {
 		ArrayList<Task> result = new ArrayList<Task>();
 		for (Job job : this.getProblem().getJobs()) {
@@ -223,8 +280,10 @@ public class Schedule {
 				if (task != aktuellerTask) {
 					if (hasCommonMachines(task, aktuellerTask)) {
 						if (isPreceeding(task, aktuellerTask)) {
-							if (task.getAllowedMachines().contains(aktuellerTask.getAllowedMachines().get(masch))) {
-								result.add(task);
+							for (Machine m : task.getAllowedMachines()) {
+								if (m.getMachineNumber() == aktuellerTask.getAllowedMachines().get(masch).getMachineNumber()) {
+									result.add(task);
+								} 
 							}
 						}
 					}
@@ -271,19 +330,22 @@ public class Schedule {
 
 	private void iteratePosition(Task task) {
 		
-		
-		//TODO DEBUG
-		
 		if (relevantTasks.size() > 1) {
 			relevantTasks.remove(0);
 		} else if (relevantWorkers.size() > 1) {
+			work++;
 			relevantWorkers.remove(0);
 			getRelevantTasks(task);
 		} else if(relevantMachines.size() > 1) {
+			masch++;
 			relevantMachines.remove(0);
 			getRelevantTasks(task);
 			getRelevantWorkers(task);
-		} else blockzaehler = 0;
+			work=0;
+		} else {
+			blockzaehler = 0;
+			masch=0;
+		}
 		updateNext();
 		
 		/**
