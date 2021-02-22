@@ -10,7 +10,15 @@ public class Solver {
 		Solution initialSolution = new Solution();
 		initialSolution = createInitialSolution(problem);
 		
+		Solution finalSolution = new Solution();
+		finalSolution = useHeuristik(initialSolution);
+		
 
+	}
+
+	private static Solution useHeuristik(Solution initialSolution) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private static Solution createInitialSolution(ProblemDetails problem) {
