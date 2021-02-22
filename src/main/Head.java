@@ -1,6 +1,6 @@
 package main;
 
-public class Solver {
+public class Head {
 	
 	public static void main(String[] args) {
 		
@@ -13,8 +13,12 @@ public class Solver {
 		Solution finalSolution = new Solution();
 		finalSolution = useHeuristik(initialSolution);
 		
+		System.out.println(initialSolution.print());
+		System.out.println(finalSolution.print());
+		
 
 	}
+
 
 	private static Solution useHeuristik(Solution initialSolution) {
 		// TODO Auto-generated method stub
