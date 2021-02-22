@@ -7,28 +7,15 @@ import java.util.Scanner;
 
 public class Schedule {
 
-	// Blockzaehler
-	private int blockzaehler = 1;
+
 	// Zählvariablen
 	private int a = 1;
 	private int b = 1;
-		
-	private int masch = 0;
-	private int work = 0;
 
-	private ArrayList<Task> relevantTasks;
-	private ArrayList<Machine> relevantMachines;
-	private ArrayList<Worker> relevantWorkers;
 	private ArrayList<Constellation> relevantConstellations;
 	
-	private Task nextTask;
-	private Machine nextMachine;
-	private Worker nextWorker;
-
 	private ProblemDetails problem;
 	
-	boolean check = true;
-
 	public Schedule() {
 		problem = new ProblemDetails();
 	}
@@ -119,15 +106,11 @@ public class Schedule {
 
 						// ermittler Aktuellen Task der Zeile
 						Task aktuellerTask = this.getProblem().getJobs()[a - 1].getTasks().get(b - 1);
-						this.updateRelevantData(aktuellerTask);		
 						relevantConstellations = this.getRelevantConstellations(aktuellerTask);
 						for (String i1 : data) {
 							int setuptime = Integer.parseInt(i1);
-							Constellation constellation = this.getNextConstellation(aktuellerTask, blockzaehler);							
-							if (constellation != null) {
-								this.addSetupTime(constellation, setuptime);
-								blockzaehler++;
-							} 
+							this.addSetupTime(relevantConstellations.get(0), setuptime);
+							relevantConstellations.remove(0);
 						}
 
 						this.getNextTask(aktuellerTask);
@@ -201,123 +184,7 @@ public class Schedule {
 		return result;
 	}
 
-	private void updateRelevantData(Task aktuellerTask) {
-		updateMachines(aktuellerTask);
-		updateWorkers(aktuellerTask);
-		updateTasks(aktuellerTask);
-		/*
-		relevantMachines = this.getRelevantMachines(aktuellerTask);
-		relevantWorkers = this.getRelevantWorkers(aktuellerTask);
-		relevantTasks= this.getRelevantTasks(aktuellerTask);
-		*/
-		updateNext();
-	}
 
-	private void updateTasks(Task aktuellerTask) {
-		ArrayList<Task> tasks = new ArrayList<Task>();
-		for(Task t: this.getRelevantTasks(aktuellerTask)) {
-			tasks.add(t);
-		}
-		relevantTasks = tasks;
-	}
-
-	private void updateWorkers(Task aktuellerTask) {
-		ArrayList<Worker> workers = new ArrayList<Worker>();
-		for(Worker w: this.getRelevantWorkers(aktuellerTask)) {
-			workers.add(w);
-		}
-		relevantWorkers = workers;
-	}
-
-	private void updateMachines(Task aktuellerTask) {
-		ArrayList<Machine> machines = new ArrayList<Machine>();
-		for(Machine m: this.getRelevantMachines(aktuellerTask)) {
-			machines.add(m);
-		}
-		relevantMachines=machines;
-	}
-
-	private void updateNext() {
-		if (relevantTasks.size()>0) {
-			nextTask = relevantTasks.get(0);
-		}
-		if (relevantMachines.size()>0) {
-			nextMachine = relevantMachines.get(0);
-		}
-		if (relevantWorkers.size()>0) {
-			nextWorker = relevantWorkers.get(0);
-		}
-	}
-
-	private ArrayList<Machine> getRelevantMachines(Task aktuellerTask) {
-		ArrayList<Machine> result = new ArrayList<Machine>();
-		result = aktuellerTask.getAllowedMachines();
-		return result;
-	}
-
-	private ArrayList<Worker> getRelevantWorkers(Task aktuellerTask) {
-		
-		// TODO DEBUG
-		ArrayList<Worker> result = new ArrayList<Worker>();
-		
-		
-		for(Worker w: this.getProblem().getWorkers()) {
-			for (Machine m: w.getAllowedMachines()) {
-				if (aktuellerTask.getAllowedMachines().get(masch).getMachineNumber() == m.getMachineNumber()) {
-					result.add(w);
-				} 
-			}
-		}
-		
-		return result;
-	}
-
-	
-	private ArrayList<Task> getRelevantTasks(Task aktuellerTask) {
-		ArrayList<Task> result = new ArrayList<Task>();
-		for (Job job : this.getProblem().getJobs()) {
-			for (Task task : job.getTasks()) {
-				if (task != aktuellerTask) {
-					if (hasCommonMachines(task, aktuellerTask)) {
-						if (isPreceeding(task, aktuellerTask)) {
-							for (Machine m : task.getAllowedMachines()) {
-								if (m.getMachineNumber() == aktuellerTask.getAllowedMachines().get(masch).getMachineNumber()) {
-									result.add(task);
-								} 
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return result;
-
-	}
-
-	private boolean isPreceeding(Task task, Task aktuellerTask) {
-		boolean result = false;
-
-		if (this.getJob(task) == this.getJob(aktuellerTask)) {
-			if (this.getJob(task).getTasks().indexOf(task) < this.getJob(aktuellerTask).getTasks()
-					.indexOf(aktuellerTask)) {
-				result = true;
-			} 
-		} else result = true;
-
-		return result;
-	}
-
-	private boolean hasCommonMachines(Task task, Task aktuellerTask) {
-		boolean result = false;
-		ArrayList<Machine> listA = new ArrayList<>(task.getAllowedMachines());
-		ArrayList<Machine> listB = new ArrayList<>(aktuellerTask.getAllowedMachines());
-		listA.retainAll(listB);
-		if (listA.size() != 0) {
-			result = true;
-		}
-		return result;
-	}
 
 	private void getNextTask(Task aktuellerTask) {
 		if (b < getJob(aktuellerTask).getTasks().size()) {
@@ -328,57 +195,6 @@ public class Schedule {
 		}
 	}
 
-	private void iteratePosition(Task task) {
-		
-		if (relevantTasks.size() > 1) {
-			relevantTasks.remove(0);
-		} else if (relevantWorkers.size() > 1) {
-			work++;
-			relevantWorkers.remove(0);
-			getRelevantTasks(task);
-		} else if(relevantMachines.size() > 1) {
-			masch++;
-			relevantMachines.remove(0);
-			getRelevantTasks(task);
-			getRelevantWorkers(task);
-			work=0;
-		} else {
-			blockzaehler = 0;
-			masch=0;
-		}
-		updateNext();
-		
-		/**
-		if (relevantMachines.size() > 1) {
-			relevantMachines.remove(0);
-			getRelevantTasks(task);
-			getRelevantWorkers(task);
-		} else if (relevantWorkers.size() > 1) {
-			relevantWorkers.remove(0);
-			getRelevantTasks(task);
-		} else if (relevantTasks.size() > 1) {
-			relevantTasks.remove(0);
-		} else blockzaehler = 0;
-		updateNext();
-		**/
-		
-	}
-
-	
-	private Constellation getNextConstellation(Task aktuellerTask, int blockzaehler) { 
-		Constellation result = null; 
-				
-		if(blockzaehler==1) {
-			result = new Constellation(aktuellerTask.getTaskNumber(),nextWorker,nextMachine);
-		} else if (!relevantTasks.isEmpty()) {
-			result = new Constellation(aktuellerTask.getTaskNumber(),nextWorker,nextMachine,nextTask.getTaskNumber());
-			this.iteratePosition(aktuellerTask); 
-		}
-		
-		return result; 
-	}
-	  
-	 
 	
 	// Checks if int i is in String[] a
 	private boolean checkArray(String[] a, int i) {
