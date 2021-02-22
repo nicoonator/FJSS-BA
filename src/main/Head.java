@@ -4,30 +4,21 @@ public class Head {
 	
 	public static void main(String[] args) {
 		
-		InstanceReader instanceReader = new InstanceReader();		
-		ProblemDetails problem = instanceReader.createInstance();
-		
+		InstanceReader instanceReader = new InstanceReader();
+		Solver solver = new Solver();
 		Solution initialSolution = new Solution();
-		initialSolution = createInitialSolution(problem);
-		
 		Solution finalSolution = new Solution();
-		finalSolution = useHeuristik(initialSolution);
+			
+		ProblemDetails problem = instanceReader.createInstance();
+	
+		initialSolution = solver.createInitialSolution(problem);
+		
+		finalSolution = solver.useHeuristik(initialSolution);
 		
 		System.out.println(initialSolution.print());
 		System.out.println(finalSolution.print());
 		
 
-	}
-
-
-	private static Solution useHeuristik(Solution initialSolution) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private static Solution createInitialSolution(ProblemDetails problem) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
