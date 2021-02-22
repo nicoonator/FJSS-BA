@@ -20,7 +20,26 @@ public class Schedule {
 		problem = new ProblemDetails();
 	}
 
-	public void createInstance() {
+	private void addSetupTime(Constellation constellation, int time) {
+		int tasknumber = constellation.getTask();
+		Task task = getTaskByTasknumber(tasknumber);
+		task.addSetupTime(constellation, time);
+	}
+
+	// Checks if int i is in String[] a
+	private boolean checkArray(String[] a, int i) {
+		boolean result = false;
+		for (String s : a) {
+			if (Integer.parseInt(s) == i) {
+				result = true;
+				break;
+			}
+		}
+
+		return result;
+	}
+
+	public ProblemDetails createInstance() {
 
 		File file = new File("Files/Example_Instance.txt");
 		String line;
@@ -129,7 +148,48 @@ public class Schedule {
 		} /*
 			 * catch (ConstellationException e) { System.out.println(e.getMessage()); }
 			 */
+		return this.getProblem();
+	}
 
+	private ArrayList<Task> getAllTasks() {
+		ArrayList<Task> result = new ArrayList<Task>();
+		
+		for(Job j : this.getProblem().getJobs()) {
+			for (Task t : j.getTasks()) {
+				result.add(t);
+			}
+		}
+		
+		return result;
+	}
+
+
+
+	public Job getJob(Task task) {
+		Job result = null;
+
+		for (Job job : this.getProblem().getJobs()) {
+			for (Task t : job.getTasks()) {
+				if (t == task)
+					return job;
+			}
+		}
+
+		return result;
+	}
+
+	
+	private void getNextTask(Task aktuellerTask) {
+		if (b < getJob(aktuellerTask).getTasks().size()) {
+			b++;
+		} else if (a < this.getProblem().getJobs().length) {
+			a++;
+			b = 1;
+		}
+	}
+
+	public ProblemDetails getProblem() {
+		return problem;
 	}
 
 	private ArrayList<Constellation> getRelevantConstellations(Task aktuellerTask) {
@@ -172,60 +232,6 @@ public class Schedule {
 		return result;
 	}
 
-	private ArrayList<Task> getAllTasks() {
-		ArrayList<Task> result = new ArrayList<Task>();
-		
-		for(Job j : this.getProblem().getJobs()) {
-			for (Task t : j.getTasks()) {
-				result.add(t);
-			}
-		}
-		
-		return result;
-	}
-
-
-
-	private void getNextTask(Task aktuellerTask) {
-		if (b < getJob(aktuellerTask).getTasks().size()) {
-			b++;
-		} else if (a < this.getProblem().getJobs().length) {
-			a++;
-			b = 1;
-		}
-	}
-
-	
-	// Checks if int i is in String[] a
-	private boolean checkArray(String[] a, int i) {
-		boolean result = false;
-		for (String s : a) {
-			if (Integer.parseInt(s) == i) {
-				result = true;
-				break;
-			}
-		}
-
-		return result;
-	}
-
-	private void addSetupTime(Constellation constellation, int time) {
-		// pointer / Referenz?
-		int tasknumber = constellation.getTask();
-		Task task = getTaskByTasknumber(tasknumber);
-		task.addSetupTime(constellation, time);
-		/*
-		for (int job = 0; job < this.getProblem().getJobCount(); job++) {
-			for (int task1 = 0; task1 < this.getProblem().getJobs()[job].getTasks().size(); task1++) {
-				if (this.getProblem().getJobs()[job].getTasks().get(task1).getTaskNumber() == tasknumber) {
-					this.getProblem().getJobs()[job].getTasks().get(task1).addSetupTime(constellation, time);
-					return;
-				}
-			}
-		}
-		*/
-	}
-
 	private Task getTaskByTasknumber(int tasknumber) {
 		Task result = null;
 		
@@ -238,23 +244,6 @@ public class Schedule {
 		}
 		
 		return result;
-	}
-
-	public Job getJob(Task task) {
-		Job result = null;
-
-		for (Job job : this.getProblem().getJobs()) {
-			for (Task t : job.getTasks()) {
-				if (t == task)
-					return job;
-			}
-		}
-
-		return result;
-	}
-
-	public ProblemDetails getProblem() {
-		return problem;
 	}
 
 	public void setProblem(ProblemDetails problem) {
