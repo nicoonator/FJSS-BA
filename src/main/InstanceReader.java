@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Schedule {
+public class InstanceReader {
 
 
 	// Zählvariablen
@@ -16,7 +16,7 @@ public class Schedule {
 	
 	private ProblemDetails problem;
 	
-	public Schedule() {
+	public InstanceReader() {
 		problem = new ProblemDetails();
 	}
 

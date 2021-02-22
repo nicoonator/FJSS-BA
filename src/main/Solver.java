@@ -4,8 +4,8 @@ public class Solver {
 	
 	public static void main(String[] args) {
 		
-		Schedule schedule = new Schedule();
-		ProblemDetails problem = schedule.createInstance();
+		InstanceReader instanceReader = new InstanceReader();		
+		ProblemDetails problem = instanceReader.createInstance();
 		Solution initialSolution = Solution.createInitialSolution(problem);
 
 	}
