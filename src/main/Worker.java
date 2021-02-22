@@ -5,9 +5,11 @@ import java.util.ArrayList;
 public class Worker {
 
 	private ArrayList<Machine>  allowedMachines;
+	private final int workerNumber;
 	
-	public Worker() {
+	public Worker(int workerNumber) {
 		allowedMachines = new ArrayList<Machine>();
+		this.workerNumber = workerNumber;
 	}
 	
 
@@ -24,6 +26,11 @@ public class Worker {
 		temp = this.getAllowedMachines();
 		temp.add(m);
 		this.setAllowedMachines(temp);
+	}
+
+
+	public int getWorkerNumber() {
+		return workerNumber;
 	}
 
 
