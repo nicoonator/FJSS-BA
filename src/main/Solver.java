@@ -6,6 +6,7 @@ public class Solver {
 		
 		Schedule schedule = new Schedule();
 		ProblemDetails problem = schedule.createInstance();
+		Solution initialSolution = Solution.createInitialSolution(problem);
 
 	}
 
