@@ -8,14 +8,15 @@ public class Task {
 	private ArrayList<Machine> allowedMachines;
 	private Map <Machine, Integer> processingTimes;
 	private Map <Constellation, Integer>setupTimes;
+	private int jobNumber;
 	private int taskNumber;
 	// private ArrayList<Constellation> connectedTasks; //Nötig? TODO
 	
-	public Task(int taskNumber2) {
+	public Task(int taskNumber) {
 		allowedMachines = new ArrayList<Machine>();
 		processingTimes = new HashMap <Machine, Integer>();
 		setupTimes = new HashMap <Constellation, Integer>();
-		taskNumber=taskNumber2;
+		this.taskNumber = taskNumber;
 	}
 	
 	public ArrayList<Machine> getAllowedMachines() {
@@ -60,6 +61,14 @@ public class Task {
 
 	public void setTaskNumber(int taskNumber) {
 		this.taskNumber = taskNumber;
+	}
+
+	public int getJobNumber() {
+		return jobNumber;
+	}
+
+	public void setJobNumber(int jobNumber) {
+		this.jobNumber = jobNumber;
 	}
 	
 	

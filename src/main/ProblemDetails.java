@@ -15,7 +15,7 @@ public class ProblemDetails {
 	public void createJobs() {
 		jobs = new Job[jobCount];
 		for(int i=0; i<jobCount; i++) {
-			jobs[i] = new Job();
+			jobs[i] = new Job(i);
 		}
 	}
 	
