@@ -22,14 +22,14 @@ public class ProblemDetails {
 	public void createWorkers() {
 		workers = new Worker[workerCount];
 		for(int i=0; i<workerCount; i++) {
-			workers[i] = new Worker();
+			workers[i] = new Worker(i);
 		}
 	}
 	
 	public void createMachines() {
 		machines = new Machine[machineCount];
 		for(int i=0; i<machineCount; i++) {
-			machines[i] = new Machine();
+			machines[i] = new Machine(i);
 		}
 	}
 	
