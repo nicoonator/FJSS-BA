@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import Exceptions.SetupTimesMissingException;
+
 public class InstanceReader {
 
 
@@ -126,6 +128,9 @@ public class InstanceReader {
 						// ermittler Aktuellen Task der Zeile
 						Task aktuellerTask = this.getProblem().getJobs()[a - 1].getTasks().get(b - 1);
 						relevantConstellations = this.getRelevantConstellations(aktuellerTask);
+						if(data.length != relevantConstellations.size()) {
+							throw new SetupTimesMissingException(a,b,relevantConstellations.size());
+						}
 						for (String i1 : data) {
 							int setuptime = Integer.parseInt(i1);
 							this.addSetupTime(relevantConstellations.get(0), setuptime);
@@ -147,7 +152,11 @@ public class InstanceReader {
 			System.err.println(file.getAbsolutePath());
 		} /*
 			 * catch (ConstellationException e) { System.out.println(e.getMessage()); }
-			 */
+			 */ 
+		catch (SetupTimesMissingException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+		}
 		return this.getProblem();
 	}
 
