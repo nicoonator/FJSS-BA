@@ -3,13 +3,15 @@ package main;
 public class Solver {
 
 	public Solution useHeuristik(Solution initialSolution) {
-		// TODO Auto-generated method stub
-		return null;
+		//TODO
+		Solution result = new Solution(initialSolution.getProblem());
+		return result;
 	}
 
 	public Solution createInitialSolution(ProblemDetails problem) {
-		// TODO Auto-generated method stub
-		return null;
+		//TODO
+		Solution result = new Solution(problem);
+		return result;
 	}
 
 }
