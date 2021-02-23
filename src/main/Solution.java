@@ -45,6 +45,71 @@ public class Solution {
 	}
 	
 
+	public void addScheduledTask(Task t, Machine m, Worker w) {
+		// TODO Auto-generated method stub
+		ScheduledTask input = new ScheduledTask(t, w, m);
+		input.setSetupStartTime();
+		input.setTaskStartTime();
+		scheduledMachines.get(m.getMachineNumber()).add(input);
+	}
+
+
+	public Worker getNextWorker(Task t, Machine m) {
+		// TODO Auto-generated method stub
+		/*
+		 * Returns first FREE (non-overlapping) Worker who is allowed to setup machine m
+		 */
+		
+		//get all Allowed Workers
+		ArrayList<Worker> workers = m.getAllowedWorkers();
+		
+		//get Worker with earliestAssignmentTime
+		return getWorkerwithEarliestAssignmentTime(workers);
+	}
+
+
+	private Worker getWorkerwithEarliestAssignmentTime(ArrayList<Worker> workers) {
+		Worker result = workers.get(0);
+		for (Worker w : workers) {
+			if(getEarliestAssignmentTime(w)<getEarliestAssignmentTime(result)) {
+				result=w;
+			}
+		}
+		return result;
+	}
+
+
+	private int getEarliestAssignmentTime(Worker w) {
+		// TODO Auto-generated method stub
+		/*
+		 * Durchsuche die ScheduledMachines nach einträge mit Workern
+		 * SetupStartTime+SetupDuration
+		 */
+		ArrayList<ScheduledTask> scheduledTasks = getAllScheduledTasks(w);
+		int result = 0;
+		for(ScheduledTask t : scheduledTasks) {
+			if(t.getSetupEndTime()>result) {
+				result=t.getSetupEndTime();
+			}
+		}
+		return result;
+	}
+
+
+	private ArrayList<ScheduledTask> getAllScheduledTasks(Worker w) {
+		ArrayList<ScheduledTask> result = new ArrayList<ScheduledTask>();
+		
+		for (ArrayList<ScheduledTask> tasks : scheduledMachines) {
+			for (ScheduledTask t : tasks) {
+				if(t.getWorker().getWorkerNumber()==w.getWorkerNumber()) {
+					result.add(t);
+				}
+			} 
+		}
+		return result;
+	}
+
+
 	public Machine getNextMachine(Task t) {
 		/*
 		 * Maschine mit kleinster Processing Time returnen
