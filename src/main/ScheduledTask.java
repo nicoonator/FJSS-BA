@@ -6,8 +6,8 @@ public class ScheduledTask {
 	
 	private Task task;
 	private Worker worker;
-	private int setupStart;
-	private int taskStart;
+	private int setupStart = -1;
+	private int taskStart = -1;
 	
 	public ScheduledTask(Task task, Worker worker, int setupStart) {
 		this.task=task;
@@ -48,8 +48,13 @@ public class ScheduledTask {
 	}
 
 	public void print() {
-		//TODO
-		System.out.println("");
+		if(task != null && worker != null && setupStart != -1) {
+			if (taskStart == -1) {
+				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+worker.getWorkerNumber()+1+" setup StartTime: "+setupStart);
+			} else {
+				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+worker.getWorkerNumber()+1+" setup StartTime: "+setupStart+" Task StartTime: "+taskStart);
+			}				
+		}		
 	}
 	
 	
