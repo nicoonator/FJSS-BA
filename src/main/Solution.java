@@ -1,6 +1,7 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Solution {
 	
@@ -44,40 +45,103 @@ public class Solution {
 	}
 	
 
+	public Machine getNextMachine(Task t) {
+		/*
+		 * Maschine mit kleinster Processing Time returnen
+		 * ABER: Erste Freie Maschine mit kleinster Processing Time returnen TODO
+		 */
+		int machine = 0;
+		int time = 0;
+		for (Map.Entry<Machine, Integer> entry : t.getProcessingTimes().entrySet()) {
+			time += entry.getValue();
+		}
+		for (Map.Entry<Machine, Integer> entry : t.getProcessingTimes().entrySet()) {
+			if(entry.getValue() < time) {
+				time = entry.getValue();
+				machine=entry.getKey().getMachineNumber();
+			}
+		}
+		return problem.getMachines()[machine];
+	}
+
+
 	public Task getNextTask() {
-		// TODO Auto-generated method stub
 		/*
 		 * Job mit most Work Remaining bestimmen
 		 * Assignable Task dieses Jobs returnen
 		 */
 		Job job = getMostWorkRemaining();
+		return getAssignableTasks(job);
+	}
+
+	private Task getAssignableTasks(Job job) {
+		ArrayList<Task> remainingTasks = getRemainingTasks();
+		for(Task task : remainingTasks) {
+			if(checkAllPredecessors(task) && task.getJobNumber() == job.getJobNumber()) {
+				return task;
+			}
+		}
 		return null;
 	}
 
-	public Job getMostWorkRemaining() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	//Ermitteln der Zuweisbaren Tasks (unabhängig von Momentan freien Kapazitäten etc.)
-	public ArrayList<Task> getAssignableTasks(Solution solution) {
+	public ArrayList<Task> getAssignableTasks() {
 		//Wenn ein Vorgängertask noch nicht zugewiesen ist, muss dieser hinzugefügt werden.
-		ArrayList<Task> remainingTasks = getRemainingTasks(solution);
+		ArrayList<Task> remainingTasks = getRemainingTasks();
 		ArrayList<Task> result = new ArrayList<Task>();
 		for(Task task : remainingTasks) {
-			if(checkAllPredecessors(task,solution)) {
+			if(checkAllPredecessors(task)) {
 				result.add(task);
 			}
 		}
 		return result;
 	}
 
+
+	public Job getMostWorkRemaining() {
+		// MostWorkRemaining = Job mit der Hoechsten restlichen Taskzeit (niedrigste Pro Maschine)
+		int jobnumber = -1;
+		int workRemaining = 0;
+		for (Job job : problem.getJobs()) {
+			int i =0;
+			for(Task task: getRemainingTasks(job)) {
+				i+=task.getLeastProcessingTime();
+			}
+			if(i >= workRemaining) {
+				jobnumber=job.getJobNumber();
+			}
+		}
+		return problem.getJobs()[jobnumber];
+	}
+
+	private ArrayList<Task> getRemainingTasks(Job job) {
+		ArrayList<Task> result = new ArrayList<Task>();
+		for(Task t : allTasks) {
+			if (!isAssigned(t) && t.getJobNumber()==job.getJobNumber()) {
+				result.add(t);
+			}
+		}
+		return result;
+	}
+
+
+	public ArrayList<Task> getRemainingTasks() {
+		ArrayList<Task> result = new ArrayList<Task>();
+		for(Task t : allTasks) {
+			if (!isAssigned(t)) {
+				result.add(t);
+			}
+		}
+		return result;
+	}
+
+
 	// returns true if all predecessors of this task are already assigned
-	public boolean checkAllPredecessors(Task task, Solution solution) {
-		// TODO Auto-generated method stub
+	public boolean checkAllPredecessors(Task task) {
 		ArrayList<Task> predecessors = getAllPredecessors(task);
 		for(Task t : predecessors) {
-			if(!isAssigned(t, solution)) {
+			if(!isAssigned(t)) {
 				return false;
 			}
 		}
@@ -95,19 +159,9 @@ public class Solution {
 		return result;
 	}
 
-	public ArrayList<Task> getRemainingTasks(Solution solution) {
-		ArrayList<Task> result = new ArrayList<Task>();
-		for(Task t : allTasks) {
-			if (!isAssigned(t, solution)) {
-				result.add(t);
-			}
-		}
-		return result;
-	}
-
 	// Checks if a task is already Assigned 
-	public boolean isAssigned(Task t, Solution solution) {
-		for(ArrayList<ScheduledTask> machine : solution.getScheduledMachines()) {
+	public boolean isAssigned(Task t) {
+		for(ArrayList<ScheduledTask> machine : getScheduledMachines()) {
 			for(ScheduledTask scheduledTask : machine) {
 				if(t.getTaskNumber()==scheduledTask.getTask().getTaskNumber()) {
 					return true;
@@ -125,6 +179,13 @@ public class Solution {
 			}
 		}
 		return result;
+	}
+
+
+	//FOR TEST REASONS
+	public void bypass() {
+		scheduledMachines.get(0).add(new ScheduledTask(problem.getJobs()[0].getTasks().get(0),problem.getWorkers()[0],0));
+		
 	}	
 	
 }
