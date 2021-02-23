@@ -6,18 +6,21 @@ public class ScheduledTask {
 	
 	private Task task;
 	private Worker worker;
-	private int setupStart = -1;
-	private int taskStart = -1;
+	private int setupStartTime = -1;
+	private int taskStartTime = -1;
+	private Machine machine;
 	
-	public ScheduledTask(Task task, Worker worker) {
+	public ScheduledTask(Task task, Worker worker, Machine machine) {
 		this.task=task;
 		this.worker=worker;
+		this.machine=machine;
 	}
 	
-	public ScheduledTask(Task task, Worker worker, int setupStart) {
+	public ScheduledTask(Task task, Worker worker, int setupStart, Machine machine) {
 		this.task=task;
 		this.worker=worker;
-		this.setupStart=setupStart;
+		this.setupStartTime=setupStart;
+		this.machine=machine;
 	}
 
 	public Task getTask() {
@@ -36,33 +39,44 @@ public class ScheduledTask {
 		this.worker = worker;
 	}
 
-	public int getSetupStart() {
-		return setupStart;
+	public int getSetupStartTime() {
+		return setupStartTime;
 	}
 
-	public void setSetupStart(int setupStart) {
-		this.setupStart = setupStart;
+	public void setSetupStartTime(int setupStartTime) {
+		this.setupStartTime = setupStartTime;
 	}
 
-	public int getTaskStart() {
-		return taskStart;
+	public int getTaskStartTime() {
+		return taskStartTime;
 	}
 
-	public void setTaskStart(int taskStart) {
-		this.taskStart = taskStart;
+	public void setTaskStartTime(int taskStartTime) {
+		this.taskStartTime = taskStartTime;
 	}
 
 	public void print() {
-		if(task != null && worker != null && setupStart != -1) {
+		if(task != null && worker != null && setupStartTime != -1) {
 			int workerNumber = worker.getWorkerNumber()+1;
-			if (taskStart == -1) {
-				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup-StartTime: "+setupStart);
+			if (taskStartTime == -1) {
+				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup-StartTime: "+setupStartTime);
 			} else {
-				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup-StartTime: "+setupStart+" Task StartTime: "+taskStart);
+				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup-StartTime: "+setupStartTime+" Task StartTime: "+taskStartTime);
 			}				
 		}		
 	}
 	
-	
+	public int getTaskEndTime () {
+		return taskStartTime+task.getProcessingTimes().get(machine);
+	}
 
+	public Machine getMachine() {
+		return machine;
+	}
+
+	public void setMachine(Machine machine) {
+		this.machine = machine;
+	}
+
+	
 }
