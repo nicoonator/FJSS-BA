@@ -1,10 +1,8 @@
 package main;
 
-import java.util.ArrayList;
-
 public class Solver {
 	
-	private ProblemDetails problem;
+	Solution initialSolution;
 
 	/* Notwenige Funktionen:
 	 * Ermitteln der Verbleibenden Tasks
@@ -14,14 +12,13 @@ public class Solver {
 
 	public Solution useHeuristik(Solution initialSolution) {
 		//TODO
-		this.problem = initialSolution.getProblem();
+		this.initialSolution = initialSolution;
 		
 		Solution result = new Solution(initialSolution.getProblem());
 		return result;
 	}
 
 	public Solution createInitialSolution(ProblemDetails problem) {
-		this.problem = problem;
 		Solution solution = new Solution(problem);
 		//ArrayList<Task> remainingTasks = getRemainingTasks(solution);
 		//ArrayList<Task> assignableTasks = solution.getAssignableTasks();
@@ -33,16 +30,19 @@ public class Solver {
 		*Task so frueh wie möglich einplanen (Ruestzeit und Taskzeit separat)
 		*/
 		
-		Task t = solution.getNextTask();
-		Machine m = solution.getNextMachine(t);
-		//Worker w = solution.getNextWorker(t,m);
-		
+		while (!solution.getRemainingTasks().isEmpty()) {
+			Task t = solution.getNextTask();
+			Machine m = solution.getNextMachine(t);
+			//Worker w = solution.getNextWorker(t,m);
+			
+			//TODO
+		}
 		solution.bypass();
 		
 		//TODO		
 		
-		
-		return solution;
+		initialSolution=solution;
+		return initialSolution;
 	}
 
 	
