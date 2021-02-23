@@ -72,7 +72,9 @@ public class Task {
 	}
 
 	public String getConvertedTaskNumber() {
-		return jobNumber+1+","+taskNumber+1;
+		int i = jobNumber+1;
+		int j = taskNumber+1;
+		return i+","+j;
 	}
 	
 	
