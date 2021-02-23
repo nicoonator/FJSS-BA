@@ -30,14 +30,23 @@ public class Solver {
 		*Task so frueh wie möglich einplanen (Ruestzeit und Taskzeit separat)
 		*/
 		
-		while (!solution.getRemainingTasks().isEmpty()) {
+		boolean bypass = true;
+		
+		if (!bypass) {
+			while (!solution.getRemainingTasks().isEmpty()) {
+				Task t = solution.getNextTask();
+				Machine m = solution.getNextMachine(t);
+				Worker w = solution.getNextWorker(t,m);
+
+				//TODO
+			} 
+		} else {
 			Task t = solution.getNextTask();
 			Machine m = solution.getNextMachine(t);
-			//Worker w = solution.getNextWorker(t,m);
-			
-			//TODO
+			Worker w = solution.getNextWorker(t,m);
+			solution.bypass();	
 		}
-		solution.bypass();
+		
 		
 		//TODO		
 		
