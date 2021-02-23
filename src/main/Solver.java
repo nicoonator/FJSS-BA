@@ -24,7 +24,7 @@ public class Solver {
 		this.problem = problem;
 		Solution solution = new Solution(problem);
 		//ArrayList<Task> remainingTasks = getRemainingTasks(solution);
-		ArrayList<Task> assignableTasks = solution.getAssignableTasks(solution);
+		//ArrayList<Task> assignableTasks = solution.getAssignableTasks();
 		
 		/*Noetig: Zugriff auf alle Maschinen (solution-->ScheduledMachines)
 		*Einzuplanenden Task bestimmen (Mit Most Work Remaining) de facto job bestimmen da, nur ein Task pro Job zuweisbar ist
@@ -32,11 +32,12 @@ public class Solver {
 		*Einzuplanenden Worker bestimmen (der der für die gerinste Ruestzeit sorgt)
 		*Task so frueh wie möglich einplanen (Ruestzeit und Taskzeit separat)
 		*/
-		/*
+		
 		Task t = solution.getNextTask();
-		Machine m = solution.getNextMachine();
-		Worker w = solution.getNextWorker();
-		*/
+		Machine m = solution.getNextMachine(t);
+		//Worker w = solution.getNextWorker(t,m);
+		
+		solution.bypass();
 		
 		//TODO		
 		
