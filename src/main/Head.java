@@ -6,17 +6,16 @@ public class Head {
 		
 		InstanceReader instanceReader = new InstanceReader();
 		Solver solver = new Solver();
-		Solution initialSolution = new Solution();
-		Solution finalSolution = new Solution();
 			
 		ProblemDetails problem = instanceReader.createInstance();
 	
-		initialSolution = solver.createInitialSolution(problem);
+		Solution initialSolution = solver.createInitialSolution(problem);
+		System.out.println("This is the initial Solution:");
+		initialSolution.print();
 		
-		finalSolution = solver.useHeuristik(initialSolution);
-		
-		System.out.println(initialSolution.print());
-		System.out.println(finalSolution.print());
+		Solution finalSolution = solver.useHeuristik(initialSolution);
+		System.out.println("This is the final Solution:");
+		finalSolution.print();
 		
 
 	}
