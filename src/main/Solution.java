@@ -1,22 +1,25 @@
 package main;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Solution {
 	
 	private ProblemDetails problem;
-	private List<List<ScheduledTask>> scheduledMachines;	
+	private ArrayList<ArrayList<ScheduledTask>> scheduledMachines;	
 	
 	public Solution(ProblemDetails problem) {
 		this.problem=problem;
-		scheduledMachines = new ArrayList<List<ScheduledTask>>(problem.getMachineCount());
+		scheduledMachines = new ArrayList<ArrayList<ScheduledTask>>(problem.getMachineCount());
+		for(int i = 0; i < problem.getMachineCount(); i++) {
+			scheduledMachines.add(new ArrayList<ScheduledTask>());
+		}
 	}
 	
 
 	public void print() {
 		for (int i = 0; i < scheduledMachines.size(); i++) {
-			System.out.println("Machine "+i+":");
+			int j=i+1;
+			System.out.println("Machine "+j+":");
 			for (ScheduledTask task : scheduledMachines.get(i)) {
 				task.print();
 			}
@@ -29,14 +32,15 @@ public class Solution {
 	}
 
 
-	public List<List<ScheduledTask>> getScheduledMachines() {
+	public ArrayList<ArrayList<ScheduledTask>> getScheduledMachines() {
 		return scheduledMachines;
 	}
 
 
-	public void setScheduledMachines(List<List<ScheduledTask>> scheduledMachines) {
+	public void setScheduledMachines(ArrayList<ArrayList<ScheduledTask>> scheduledMachines) {
 		this.scheduledMachines = scheduledMachines;
 	}
+	
 
 	
 	
