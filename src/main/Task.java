@@ -70,6 +70,10 @@ public class Task {
 	public void setJobNumber(int jobNumber) {
 		this.jobNumber = jobNumber;
 	}
+
+	public String getConvertedTaskNumber() {
+		return jobNumber+1+","+taskNumber+1;
+	}
 	
 	
 
