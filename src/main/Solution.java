@@ -52,16 +52,63 @@ public class Solution {
 		 */
 		int machine = 0;
 		int time = 0;
+		
+		ArrayList<Machine> machines = getFirstFreeMachines(t);
+		
 		for (Map.Entry<Machine, Integer> entry : t.getProcessingTimes().entrySet()) {
 			time += entry.getValue();
 		}
 		for (Map.Entry<Machine, Integer> entry : t.getProcessingTimes().entrySet()) {
-			if(entry.getValue() < time) {
+			if(entry.getValue() < time && machines.contains(entry.getKey())) {
 				time = entry.getValue();
 				machine=entry.getKey().getMachineNumber();
 			}
 		}
 		return problem.getMachines()[machine];
+	}
+
+
+	private ArrayList<Machine> getFirstFreeMachines(Task t) {
+		// TODO Auto-generated method stub
+		/*
+		 * gets all Machines which are allowed in task T and have the earliest available time
+		 */
+		ArrayList<Machine> result = new ArrayList<Machine>();
+		ArrayList<Machine> machinesOfTask = t.getAllowedMachines();
+		int time = getEarliestAvailableTime(machinesOfTask);
+		for (Machine m: machinesOfTask) {
+			if (calculateEarliestAvailableTime(m) == time) {
+				result.add(m);
+			}
+		}
+
+		return result;
+	}
+
+
+	private int getEarliestAvailableTime(ArrayList<Machine> machinesOfTask) {
+		int result = calculateEarliestAvailableTime(machinesOfTask.get(0));
+		for(Machine m : machinesOfTask) {
+			if(calculateEarliestAvailableTime(m)<result) {
+				result=calculateEarliestAvailableTime(m);
+			}
+		}
+		return result;
+	}
+
+
+	private int calculateEarliestAvailableTime(Machine m) {
+		
+		ArrayList<ScheduledTask> machineSchedule = scheduledMachines.get(m.getMachineNumber());
+		if(machineSchedule.isEmpty()) return 0;
+		
+		int time = machineSchedule.get(0).getTaskEndTime();
+		for(ScheduledTask t : machineSchedule) {
+			if(t.getTaskEndTime()<time) {
+				time = t.getTaskEndTime();
+			}
+		}
+		return time;
 	}
 
 
@@ -184,7 +231,7 @@ public class Solution {
 
 	//FOR TEST REASONS
 	public void bypass() {
-		scheduledMachines.get(0).add(new ScheduledTask(problem.getJobs()[0].getTasks().get(0),problem.getWorkers()[0],0));
+		scheduledMachines.get(0).add(new ScheduledTask(problem.getJobs()[0].getTasks().get(0),problem.getWorkers()[0],0,problem.getMachines()[0]));
 		
 	}	
 	
