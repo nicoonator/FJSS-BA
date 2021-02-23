@@ -76,6 +76,20 @@ public class Task {
 		int j = taskNumber+1;
 		return i+","+j;
 	}
+
+	public int getLeastProcessingTime() {
+		int i = -1;
+		for (Map.Entry<Machine, Integer> entry : processingTimes.entrySet()) {
+			if (i == -1) {
+				i=entry.getValue();
+			} else {
+				if (entry.getValue()<=i) {
+					i=entry.getValue();
+				}
+			}
+		}
+		return i;
+	}
 	
 	
 
