@@ -46,6 +46,11 @@ public class ScheduledTask {
 	public void setTaskStart(int taskStart) {
 		this.taskStart = taskStart;
 	}
+
+	public void print() {
+		//TODO
+		System.out.println("");
+	}
 	
 	
 
