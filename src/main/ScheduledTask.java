@@ -49,10 +49,11 @@ public class ScheduledTask {
 
 	public void print() {
 		if(task != null && worker != null && setupStart != -1) {
+			int workerNumber = worker.getWorkerNumber()+1;
 			if (taskStart == -1) {
-				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+worker.getWorkerNumber()+1+" setup StartTime: "+setupStart);
+				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" setup StartTime: "+setupStart);
 			} else {
-				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+worker.getWorkerNumber()+1+" setup StartTime: "+setupStart+" Task StartTime: "+taskStart);
+				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" setup StartTime: "+setupStart+" Task StartTime: "+taskStart);
 			}				
 		}		
 	}
