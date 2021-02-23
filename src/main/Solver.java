@@ -38,7 +38,7 @@ public class Solver {
 				Machine m = solution.getNextMachine(t);
 				Worker w = solution.getNextWorker(t,m);
 
-				//TODO
+				solution.addScheduledTask(t,m,w);
 			} 
 		} else {
 			Task t = solution.getNextTask();
