@@ -1,5 +1,7 @@
 package main;
 
+import java.util.Map;
+
 public class ScheduledTask {
 	
 	// This Class is used to contain the information which tasks is assigned to a specific Machine
@@ -9,6 +11,7 @@ public class ScheduledTask {
 	private int setupStartTime = -1;
 	private int taskStartTime = -1;
 	private Machine machine;
+	private int predecessor = -1;
 	
 	public ScheduledTask(Task task, Worker worker, Machine machine) {
 		this.task=task;
@@ -68,6 +71,29 @@ public class ScheduledTask {
 	
 	public int getTaskEndTime () {
 		return taskStartTime+task.getProcessingTimes().get(machine);
+	}
+	
+	public int getSetupEndTime () {
+		return setupStartTime+getSetupDuration();
+	}
+
+	private int getSetupDuration() {
+		int result = 0;
+		
+		Map<Constellation,Integer> setupTimes= task.getSetupTimes();
+		
+		for(Map.Entry<Constellation, Integer> entry : setupTimes.entrySet()) {
+			Constellation constellation = entry.getKey();
+			if (constellation.getMachine() == machine) {
+				if (constellation.getWorker() == worker) {
+					if (constellation.getPredecessor() == predecessor) {
+						return entry.getValue();
+					}
+				}
+			}
+		}
+		
+		return result;
 	}
 
 	public Machine getMachine() {
