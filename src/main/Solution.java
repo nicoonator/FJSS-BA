@@ -3,6 +3,9 @@ package main;
 import java.util.ArrayList;
 import java.util.Map;
 
+import Exceptions.ScheduledTaskByTaskNumberException;
+import Exceptions.SetupDurationNotFoundException;
+
 public class Solution {
 	
 	private ProblemDetails problem;
@@ -22,11 +25,27 @@ public class Solution {
 	public void print() {
 		for (int i = 0; i < scheduledMachines.size(); i++) {
 			int j=i+1;
+			System.out.println();
 			System.out.println("Machine "+j+":");
 			for (ScheduledTask task : scheduledMachines.get(i)) {
 				task.print();
 			}
 		}
+		System.out.println();
+		System.out.println("Makespan: "+getMakespan());
+	}
+
+
+	private int getMakespan() {
+		int result = 0;
+		for(ArrayList<ScheduledTask> machine: scheduledMachines) {
+			for(ScheduledTask task : machine) {
+				if(task.getTaskEndTime()>result) {
+					result=task.getTaskEndTime();
+				}
+			}
+		}
+		return result;
 	}
 
 
@@ -45,17 +64,154 @@ public class Solution {
 	}
 	
 
-	public void addScheduledTask(Task t, Machine m, Worker w) {
-		// TODO Auto-generated method stub
+	public void addScheduledTask(Task t, Machine m, Worker w) throws SetupDurationNotFoundException, ScheduledTaskByTaskNumberException {
 		ScheduledTask input = new ScheduledTask(t, w, m);
-		input.setSetupStartTime();
-		input.setTaskStartTime();
+		input.setPredecessor(getPredecessor(m));
+		input.setSetupStartTime(getSetupStartTime(m,w));
+		input.setTaskStartTime(getTaskStartTime(t,m,w));	
+		input.calculateSetupEndTime();
+		input.calculateTaskEndTime();
 		scheduledMachines.get(m.getMachineNumber()).add(input);
 	}
 
 
-	public Worker getNextWorker(Task t, Machine m) {
+	private int getPredecessor(Machine m) {
+		if (scheduledMachines.get(m.getMachineNumber()).isEmpty()) {
+			return -1;
+		}
+		
+		return scheduledMachines.get(m.getMachineNumber()).get(scheduledMachines.get(m.getMachineNumber()).size()-1).getTask().getTaskNumber();
+	}
+
+
+	private int getSetupStartTime( Machine m, Worker w) {
+		/*
+		 * SetupStartTime frueheste Zeit bei der Machine Frei und Worker frei
+		 */
+		int machineTime = getMachineTime(m);
+		int workerTime = getWorkerTime(w);
+		return Math.max(machineTime, workerTime);
+	}
+
+
+	private int getWorkerTime(Worker w) {
+		/*
+		 * Zeit ab der der Worker w verfügbar ist
+		 */
+		int result = 0;
+		ArrayList<ScheduledTask> scheduledTasks = getAllScheduledTasks(w);
+		for(ScheduledTask scheduledTask : scheduledTasks) {
+			if(scheduledTask.getSetupEndTime()>result) {
+				result=scheduledTask.getSetupEndTime();
+			}
+		}
+		
+		return result;
+	}
+
+
+	private int getMachineTime(Machine m) {
+		/*
+		 * Zeit ab der die Maschine m verfügbar ist
+		 */
+		ArrayList<ScheduledTask> scheduledTask = scheduledMachines.get(m.getMachineNumber());
+		if (!scheduledTask.isEmpty()) {
+			return scheduledTask.get(scheduledTask.size() - 1).getTaskEndTime();
+		} else return 0;
+	}
+
+
+	private int getTaskStartTime(Task t, Machine m, Worker w) throws SetupDurationNotFoundException, ScheduledTaskByTaskNumberException {
 		// TODO Auto-generated method stub
+		/*
+		 * Zeit wenn der Ruestvorgang beendet ist 
+		 * und der vorherige Task des Aktuellen Jobs beendet ist
+		 * spaeterer werd
+		 */
+		int setupEndTime = getSetupStartTime(m, w)+getSetupDuration(t,m,w);
+		int lastTaskInJob = getLastTaskInJob(t);
+		int lastTaskInJobEndTime;
+		if (lastTaskInJob!=-1) {
+			lastTaskInJobEndTime = getTaskEndTime(lastTaskInJob);
+		} else {
+			lastTaskInJobEndTime =0;
+		}
+		
+		return Math.max(setupEndTime, lastTaskInJobEndTime);
+	}
+
+
+	private int getTaskEndTime(int lastTaskInJob) throws ScheduledTaskByTaskNumberException {
+		// TODO
+		/*
+		 * durchsucht scheduledMachines nach dem Task mit der Tasknummer und holt sich dessen Endtime
+		 */
+		return getScheduledTaskByTaskNumber(lastTaskInJob).getTaskEndTime();
+	}
+
+
+	private ScheduledTask getScheduledTaskByTaskNumber(int lastTaskInJob) throws ScheduledTaskByTaskNumberException {
+		for(ArrayList<ScheduledTask> machines : scheduledMachines) {
+			for(ScheduledTask task : machines) {
+				if(task.getTask().getTaskNumber()==lastTaskInJob) {
+					return task;
+				}
+			}
+		}
+		throw new ScheduledTaskByTaskNumberException();
+	}
+
+
+	private int getLastTaskInJob(Task t) {
+		/*
+		 * Falls der Task t der erste Task ist --> return -1
+		 * Ansonsten return den letzten Task mit niedriegerer Tasknumber
+		 */
+		ArrayList<Task> tasks = getAllTasksInJobBeforeT(t);
+		if(tasks.isEmpty()) {
+			return -1;
+		} else {
+			return tasks.get(tasks.size()-1).getTaskNumber();
+		}
+	}
+
+
+	private ArrayList<Task> getAllTasksInJobBeforeT(Task t) {
+		ArrayList<Task> result = new ArrayList<Task>();
+		
+		for(Task task : problem.getJobs()[t.getJobNumber()].getTasks()) {
+			if(task.getTaskNumber()<t.getTaskNumber()) {
+				result.add(task);
+			}
+		}
+		
+		return result;
+	}
+
+
+	private int getSetupDuration(Task t, Machine m, Worker w) throws SetupDurationNotFoundException {
+		// TODO Auto-generated method stub
+		/*
+		 * Abhängig vom Predecessor! --> Ermittlen
+		 */
+		int predecessor = getPredecessor(m);
+		Map<Constellation,Integer> setupTimes= t.getSetupTimes();
+		
+		for(Map.Entry<Constellation, Integer> entry : setupTimes.entrySet()) {
+			Constellation constellation = entry.getKey();
+			if (constellation.getMachine() == m) {
+				if (constellation.getWorker() == w) {
+					if (constellation.getPredecessor() == predecessor) {
+						return entry.getValue();
+					}
+				}
+			}
+		}
+		throw new SetupDurationNotFoundException(t,m,w,predecessor);
+	}
+
+
+	public Worker getNextWorker(Task t, Machine m) {
 		/*
 		 * Returns first FREE (non-overlapping) Worker who is allowed to setup machine m
 		 */
@@ -80,7 +236,7 @@ public class Solution {
 
 
 	private int getEarliestAssignmentTime(Worker w) {
-		// TODO Auto-generated method stub
+		
 		/*
 		 * Durchsuche die ScheduledMachines nach einträge mit Workern
 		 * SetupStartTime+SetupDuration
@@ -113,7 +269,7 @@ public class Solution {
 	public Machine getNextMachine(Task t) {
 		/*
 		 * Maschine mit kleinster Processing Time returnen
-		 * ABER: Erste Freie Maschine mit kleinster Processing Time returnen TODO
+		 * ABER: Erste Freie Maschine mit kleinster Processing Time returnen 
 		 */
 		int machine = 0;
 		int time = 0;
@@ -134,7 +290,6 @@ public class Solution {
 
 
 	private ArrayList<Machine> getFirstFreeMachines(Task t) {
-		// TODO Auto-generated method stub
 		/*
 		 * gets all Machines which are allowed in task T and have the earliest available time
 		 */
@@ -222,6 +377,7 @@ public class Solution {
 			}
 			if(i >= workRemaining) {
 				jobnumber=job.getJobNumber();
+				workRemaining=i;
 			}
 		}
 		return problem.getJobs()[jobnumber];

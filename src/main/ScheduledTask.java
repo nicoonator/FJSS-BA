@@ -10,6 +10,8 @@ public class ScheduledTask {
 	private Worker worker;
 	private int setupStartTime = -1;
 	private int taskStartTime = -1;
+	private int setupEndTime;
+	private int taskEndTime;
 	private Machine machine;
 	private int predecessor = -1;
 	
@@ -62,19 +64,21 @@ public class ScheduledTask {
 		if(task != null && worker != null && setupStartTime != -1) {
 			int workerNumber = worker.getWorkerNumber()+1;
 			if (taskStartTime == -1) {
-				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup-StartTime: "+setupStartTime);
+				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup StartTime: "+setupStartTime);
 			} else {
-				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup-StartTime: "+setupStartTime+" Task StartTime: "+taskStartTime);
+				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup StartTime: "+setupStartTime+" Setup EndTime: "+setupEndTime+" Task StartTime: "+taskStartTime+" Task EndTime: "+taskEndTime);
 			}				
 		}		
 	}
 	
-	public int getTaskEndTime () {
-		return taskStartTime+task.getProcessingTimes().get(machine);
+	public int calculateTaskEndTime () {
+		taskEndTime = taskStartTime+task.getProcessingTimes().get(machine);
+		return taskEndTime;
 	}
 	
-	public int getSetupEndTime () {
-		return setupStartTime+getSetupDuration();
+	public int calculateSetupEndTime () {
+		setupEndTime = setupStartTime+getSetupDuration();
+		return setupEndTime;
 	}
 
 	private int getSetupDuration() {
@@ -104,5 +108,30 @@ public class ScheduledTask {
 		this.machine = machine;
 	}
 
+	public int getPredecessor() {
+		return predecessor;
+	}
+
+	public void setPredecessor(int predecessor) {
+		this.predecessor = predecessor;
+	}
+
+	public void setSetupEndTime(int setupEndTime) {
+		this.setupEndTime = setupEndTime;
+	}
+
+	public void setTaskEndTime(int taskEndTime) {
+		this.taskEndTime = taskEndTime;
+	}
+
+	public int getSetupEndTime() {
+		return setupEndTime;
+	}
+
+	public int getTaskEndTime() {
+		return taskEndTime;
+	}
+
+	
 	
 }
