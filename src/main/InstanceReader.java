@@ -88,8 +88,10 @@ public class InstanceReader {
 						break;
 					case 3:
 						data = line.split(";");
+						int z=0;
 						for (String allowedMachines : data) {
-							this.getProblem().getJobs()[k - 1].addTask(new Task(taskNumber));
+							this.getProblem().getJobs()[k - 1].addTask(new Task(taskNumber,z));
+							z++;
 							taskNumber++;
 							for (String allowedMachine : allowedMachines.split(",")) {
 								this.getProblem().getJobs()[k - 1].getTasks().get(t - 1).addAllowedMachine(
