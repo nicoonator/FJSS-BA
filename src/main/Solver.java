@@ -13,9 +13,17 @@ public class Solver {
 	 */
 	
 
-	public Solution useHeuristik(Solution initialSolution) {
+	public Solution useHeuristik() {
 		//TODO
-		this.initialSolution = initialSolution;
+				
+		// Extrahiere Taskreihenfolge aus Initial Solution (Teilweise unabhängig vom Worker)
+		// Neue Methode um Solution aus Taskreihenfolge zu kreieren
+		// Methode zum Ändern der Taskreihenfolge
+		
+		/*
+		 * TODO Neue Klasse für Taskreihenfolge auf einer Maschine?
+		 * TODO Methode zum Ueberpruefen ob eine Taskreihenfolge zulaessig ist (bezogen auf Tasks)
+		 */
 		
 		Solution result = initialSolution;
 		return result;
