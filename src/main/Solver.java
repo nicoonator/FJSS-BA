@@ -1,5 +1,8 @@
 package main;
 
+import Exceptions.ScheduledTaskByTaskNumberException;
+import Exceptions.SetupDurationNotFoundException;
+
 public class Solver {
 	
 	Solution initialSolution;
@@ -14,11 +17,11 @@ public class Solver {
 		//TODO
 		this.initialSolution = initialSolution;
 		
-		Solution result = new Solution(initialSolution.getProblem());
+		Solution result = initialSolution;
 		return result;
 	}
 
-	public Solution createInitialSolution(ProblemDetails problem) {
+	public Solution createInitialSolution(ProblemDetails problem) throws SetupDurationNotFoundException, ScheduledTaskByTaskNumberException {
 		Solution solution = new Solution(problem);
 		//ArrayList<Task> remainingTasks = getRemainingTasks(solution);
 		//ArrayList<Task> assignableTasks = solution.getAssignableTasks();
@@ -30,7 +33,7 @@ public class Solver {
 		*Task so frueh wie möglich einplanen (Ruestzeit und Taskzeit separat)
 		*/
 		
-		boolean bypass = true;
+		boolean bypass = false;
 		
 		if (!bypass) {
 			while (!solution.getRemainingTasks().isEmpty()) {
