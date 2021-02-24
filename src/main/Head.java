@@ -20,7 +20,7 @@ public class Head {
 			
 			System.out.println();
 			
-			Solution finalSolution = solver.useHeuristik(initialSolution);
+			Solution finalSolution = solver.useHeuristik();
 			System.out.println("This is the final Solution:");
 			finalSolution.print();
 		} catch (SetupDurationNotFoundException e) {
