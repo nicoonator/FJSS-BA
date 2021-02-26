@@ -16,7 +16,7 @@ public class Solver {
 	public Solution useHeuristik() {
 		//TODO
 				
-		// Extrahiere Taskreihenfolge aus Initial Solution (Teilweise unabhängig vom Worker)
+		// Extrahiere Taskreihenfolge aus Initial Solution (Teilweise unabhängig vom Worker) (in Solution als neue Variable?)
 		// Neue Methode um Solution aus Taskreihenfolge zu kreieren
 		// Methode zum Ändern der Taskreihenfolge
 		
