@@ -25,13 +25,12 @@ public class Solution {
 	public void print() {
 		for (int i = 0; i < scheduledMachines.size(); i++) {
 			int j=i+1;
-			System.out.println();
 			System.out.println("Machine "+j+":");
 			for (ScheduledTask task : scheduledMachines.get(i)) {
 				task.print();
 			}
+			System.out.println();
 		}
-		System.out.println();
 		System.out.println("Makespan: "+getMakespan());
 	}
 
