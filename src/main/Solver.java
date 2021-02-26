@@ -9,15 +9,15 @@ public class Solver {
 
 	/* Notwenige Funktionen:
 	 * Ermitteln der Verbleibenden Tasks
-	 * Ermitteln der Zuweisbaren Tasks (unabhängig von Momentan freien Kapazitäten etc.)
+	 * Ermitteln der Zuweisbaren Tasks (unabhängig von Momentan freien Kapazitaeten etc.)
 	 */
 	
 
 	public Solution useHeuristik() {
 		//TODO
 				
-		// Extrahiere Taskreihenfolge aus Initial Solution (Teilweise unabhängig vom Worker) (in Solution als neue Variable?)
-		// Neue Methode um Solution aus Taskreihenfolge zu kreieren
+		// Extrahiere Taskreihenfolge aus Initial Solution (Teilweise unabhaengig vom Worker) (in Solution als neue Variable?)
+		// Neue Methode um Solution aus Taskreihenfolge zu kreieren (zu aendern)
 		// Methode zum Ändern der Taskreihenfolge
 		
 		/*
@@ -41,25 +41,14 @@ public class Solver {
 		*Task so frueh wie möglich einplanen (Ruestzeit und Taskzeit separat)
 		*/
 		
-		boolean bypass = false;
 		
-		if (!bypass) {
-			while (!solution.getRemainingTasks().isEmpty()) {
-				Task t = solution.getNextTask();
-				Machine m = solution.getNextMachine(t);
-				Worker w = solution.getNextWorker(t,m);
-
-				solution.addScheduledTask(t,m,w);
-			} 
-		} else {
+		while (!solution.getRemainingTasks().isEmpty()) {
 			Task t = solution.getNextTask();
 			Machine m = solution.getNextMachine(t);
 			Worker w = solution.getNextWorker(t,m);
-			solution.bypass();	
+
+			solution.addScheduledTask(t,m,w);
 		}
-		
-		
-		//TODO		
 		
 		initialSolution=solution;
 		return initialSolution;
