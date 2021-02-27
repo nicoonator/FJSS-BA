@@ -74,6 +74,7 @@ public class Solution {
 		}
 		ScheduledTask reinsert = getScheduledTaskByTaskNumber(task.getTaskNumber());
 		// Der Task reinsert muss zuerst an seiner Alten Position geloescht werden (und der Predecessor und die SetupDuration des nachfolgeTasks aktualisiert werden)
+		removeScheduledTask(reinsert);
 		
 		// Block time fuer neue Position berechnen 
 		
@@ -86,6 +87,13 @@ public class Solution {
 	}
 	
 	
+
+	private void removeScheduledTask(ScheduledTask task) {
+		// TODO Auto-generated method stub
+		// Der Task task muss zuerst an seiner Alten Position geloescht werden (und der Predecessor und die SetupDuration des nachfolgeTasks aktualisiert werden)
+		
+	}
+
 
 	private void rearrangeTimes() {
 		// hier soll in einer Schleife versucht werden, die ScheduledTasks nach vorne zu verschieben, bis keine verschiebung mehr moeglich ist
