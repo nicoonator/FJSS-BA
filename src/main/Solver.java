@@ -20,13 +20,9 @@ public class Solver {
 		// Neue Methode um Solution aus Taskreihenfolge zu kreieren (zu aendern)
 		// Methode zum Ändern der Taskreihenfolge
 		
-		/*
-		 * TODO Neue Klasse für Taskreihenfolge auf einer Maschine?
-		 * TODO Methode zum Ueberpruefen ob eine Taskreihenfolge zulaessig ist (bezogen auf Tasks)
-		 */
-		
-		Solution result = initialSolution;
-		return result;
+
+		//initialSolution.getSolutionByTaskOrder();
+		return initialSolution;
 	}
 
 	public Solution createInitialSolution(ProblemDetails problem) throws SetupDurationNotFoundException, ScheduledTaskByTaskNumberException {

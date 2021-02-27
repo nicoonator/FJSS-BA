@@ -3,21 +3,27 @@ package main;
 import java.util.ArrayList;
 import java.util.Map;
 
+import Exceptions.NotAValidPositionException;
 import Exceptions.ScheduledTaskByTaskNumberException;
 import Exceptions.SetupDurationNotFoundException;
 
 public class Solution {
 	
+
 	private ProblemDetails problem;
 	private ArrayList<ArrayList<ScheduledTask>> scheduledMachines;
-	ArrayList<Task> allTasks;
+	private ArrayList<Task> allTasks;
+	private ArrayList<ArrayList<Task>> taskOrder;
 	
 	public Solution(ProblemDetails problem) {
 		this.problem=problem;
 		scheduledMachines = new ArrayList<ArrayList<ScheduledTask>>(problem.getMachineCount());
+		taskOrder = new ArrayList<ArrayList<Task>>(problem.getMachineCount());
 		for(int i = 0; i < problem.getMachineCount(); i++) {
 			scheduledMachines.add(new ArrayList<ScheduledTask>());
+			taskOrder.add(new ArrayList<Task>());
 		}
+		
 		allTasks = getAllTasks();
 	}
 	
@@ -47,7 +53,6 @@ public class Solution {
 		return result;
 	}
 
-
 	public ProblemDetails getProblem() {
 		return problem;
 	}
@@ -62,6 +67,75 @@ public class Solution {
 		this.scheduledMachines = scheduledMachines;
 	}
 	
+	public void reinsertTask(Task task, int newPredecessor, Machine machine) throws ScheduledTaskByTaskNumberException, NotAValidPositionException {
+		//TODO
+		if(!isValidPosition(task, newPredecessor, machine)) {
+			throw new NotAValidPositionException();
+		}
+		ScheduledTask reinsert = getScheduledTaskByTaskNumber(task.getTaskNumber());
+		// Der Task reinsert muss zuerst an seiner Alten Position geloescht werden (und der Predecessor und die SetupDuration des nachfolgeTasks aktualisiert werden)
+		
+		// Block time fuer neue Position berechnen 
+		
+		// Dann muessen predecessor und setupTime des neuen Nachfolgetask aktualisiert werden
+		// Dann muessen alle Tasks (und dependend Tasks) nach der neuen Position (um die Blocktime) nach hinten geschoben werden. 
+		// Dann kann der neue Tasks eingesetzt werden
+		
+		rearrangeTimes();	
+
+	}
+	
+	
+
+	private void rearrangeTimes() {
+		// hier soll in einer Schleife versucht werden, die ScheduledTasks nach vorne zu verschieben, bis keine verschiebung mehr moeglich ist
+		
+		boolean check = true;
+		while (check) {
+			check=false;
+			for(ArrayList<ScheduledTask> tasks : scheduledMachines) {
+				for(ScheduledTask task : tasks) {
+					if(isRearrangable(task)) {
+						check=true;
+						rearrange(task);
+					}
+				}
+			}			
+		}		
+	}
+
+
+	private void rearrange(ScheduledTask task) {
+		// TODO Auto-generated method stub
+		/*
+		 *  the task can be excecuted or set up earlier
+		 *  this method does this
+		 */
+		
+	}
+
+
+	private boolean isRearrangable(ScheduledTask task) {
+		// TODO Auto-generated method stub
+		/*
+		 * Returns true if the task could be excecuted or set up earlier
+		 */
+		return false;
+	}
+
+
+	private boolean isValidPosition(Task task, int newPredecessor, Machine m) {
+		// TODO Auto-generated method stub
+		/*
+		 * Returns true if the task could be inserted in given position
+		 */
+		// Wenn die Nachfolgetasks des Jobs von Tasks auf dieser Maschine vorher ausgefuehrt werden : false
+		return false;
+	}
+
+	public void changeWorker() {
+		//TODO
+	}
 
 	public void addScheduledTask(Task t, Machine m, Worker w) throws SetupDurationNotFoundException, ScheduledTaskByTaskNumberException {
 		ScheduledTask input = new ScheduledTask(t, w, m);
@@ -71,6 +145,7 @@ public class Solution {
 		input.calculateSetupEndTime();
 		input.calculateTaskEndTime();
 		scheduledMachines.get(m.getMachineNumber()).add(input);
+		taskOrder.get(m.getMachineNumber()).add(t);
 	}
 
 
@@ -121,7 +196,6 @@ public class Solution {
 
 
 	private int getTaskStartTime(Task t, Machine m, Worker w) throws SetupDurationNotFoundException, ScheduledTaskByTaskNumberException {
-		// TODO Auto-generated method stub
 		/*
 		 * Zeit wenn der Ruestvorgang beendet ist 
 		 * und der vorherige Task des Aktuellen Jobs beendet ist
@@ -141,7 +215,6 @@ public class Solution {
 
 
 	private int getTaskEndTime(int lastTaskInJob) throws ScheduledTaskByTaskNumberException {
-		// TODO
 		/*
 		 * durchsucht scheduledMachines nach dem Task mit der Tasknummer und holt sich dessen Endtime
 		 */
@@ -189,7 +262,6 @@ public class Solution {
 
 
 	private int getSetupDuration(Task t, Machine m, Worker w) throws SetupDurationNotFoundException {
-		// TODO Auto-generated method stub
 		/*
 		 * Abhängig vom Predecessor! --> Ermittlen
 		 */
@@ -449,10 +521,5 @@ public class Solution {
 	}
 
 
-	//FOR TEST REASONS
-	public void bypass() {
-		scheduledMachines.get(0).add(new ScheduledTask(problem.getJobs()[0].getTasks().get(0),problem.getWorkers()[0],0,problem.getMachines()[0]));
-		
-	}	
 	
 }
