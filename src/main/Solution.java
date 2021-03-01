@@ -86,7 +86,13 @@ public class Solution {
 
 	}
 	
-	
+	private ArrayList<Task> getTasksOnCriticalPath(){
+		ArrayList<Task> result = new ArrayList<Task>();
+		
+		//TODO
+		
+		return result;
+	}
 
 	private void removeScheduledTask(ScheduledTask task) {
 		// TODO Auto-generated method stub
@@ -137,7 +143,7 @@ public class Solution {
 		/*
 		 * Returns true if the task could be inserted in given position
 		 */
-		// Wenn die Nachfolgetasks des Jobs von Tasks auf dieser Maschine vorher ausgefuehrt werden : false
+		// Wenn die Nachfolgetasks des Jobs von Task auf dieser Maschine vorher ausgefuehrt werden : false
 		return false;
 	}
 
@@ -207,7 +213,7 @@ public class Solution {
 		/*
 		 * Zeit wenn der Ruestvorgang beendet ist 
 		 * und der vorherige Task des Aktuellen Jobs beendet ist
-		 * spaeterer werd
+		 * spaeterer wert
 		 */
 		int setupEndTime = getSetupStartTime(m, w)+getSetupDuration(t,m,w);
 		int lastTaskInJob = getLastTaskInJob(t);
@@ -295,11 +301,9 @@ public class Solution {
 		 * Returns first FREE (non-overlapping) Worker who is allowed to setup machine m
 		 */
 		
-		//get all Allowed Workers
-		ArrayList<Worker> workers = m.getAllowedWorkers();
 		
 		//get Worker with earliestAssignmentTime
-		return getWorkerwithEarliestAssignmentTime(workers);
+		return getWorkerwithEarliestAssignmentTime(m.getAllowedWorkers());
 	}
 
 
