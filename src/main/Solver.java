@@ -6,6 +6,7 @@ import Exceptions.SetupDurationNotFoundException;
 public class Solver {
 	
 	Solution initialSolution;
+	Solution solution;
 
 	/* Notwenige Funktionen:
 	 * Ermitteln der Verbleibenden Tasks
@@ -21,8 +22,23 @@ public class Solver {
 		// Methode zum Ändern der Taskreihenfolge
 		
 
-		//initialSolution.getSolutionByTaskOrder();
-		return initialSolution;
+		solution = new Solution(initialSolution);
+		localSearch();
+		return solution;
+	}
+
+	private void localSearch() {
+		// TODO Auto-generated method stub
+		int makespan = solution.getMakespan();
+		boolean check = true;
+		while (check) {
+			check = false;
+			int makespan2 = solution.findBestNeighbor();
+			if(makespan2<makespan) {
+				check=true;
+				makespan = makespan2;
+			}
+		}
 	}
 
 	public Solution createInitialSolution(ProblemDetails problem) throws SetupDurationNotFoundException, ScheduledTaskByTaskNumberException {

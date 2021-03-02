@@ -1,6 +1,7 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Map;
 
 import Exceptions.NotAValidPositionException;
@@ -15,15 +16,26 @@ public class Solution {
 	private ArrayList<Task> allTasks;
 	private ArrayList<ArrayList<Task>> taskOrder;
 	
+	//First time
 	public Solution(ProblemDetails problem) {
 		this.problem=problem;
+		initialize(problem);		
+	}
+	
+	//Heuristik
+	public Solution (Solution solution) {
+		this.problem=solution.getProblem();
+		initialize(problem);	
+		this.taskOrder=solution.getTaskOrder();
+	}
+	
+	private void initialize(ProblemDetails problem) {
 		scheduledMachines = new ArrayList<ArrayList<ScheduledTask>>(problem.getMachineCount());
 		taskOrder = new ArrayList<ArrayList<Task>>(problem.getMachineCount());
 		for(int i = 0; i < problem.getMachineCount(); i++) {
 			scheduledMachines.add(new ArrayList<ScheduledTask>());
 			taskOrder.add(new ArrayList<Task>());
 		}
-		
 		allTasks = getAllTasks();
 	}
 	
@@ -41,7 +53,7 @@ public class Solution {
 	}
 
 
-	private int getMakespan() {
+	public int getMakespan() {
 		int result = 0;
 		for(ArrayList<ScheduledTask> machine: scheduledMachines) {
 			for(ScheduledTask task : machine) {
@@ -67,8 +79,9 @@ public class Solution {
 		this.scheduledMachines = scheduledMachines;
 	}
 	
+	/*
 	public void reinsertTask(Task task, int newPredecessor, Machine machine) throws ScheduledTaskByTaskNumberException, NotAValidPositionException {
-		//TODO
+		//TO DO
 		if(!isValidPosition(task, newPredecessor, machine)) {
 			throw new NotAValidPositionException();
 		}
@@ -85,17 +98,18 @@ public class Solution {
 		rearrangeTimes();	
 
 	}
-	
+	*/
+	/*
 	private ArrayList<Task> getTasksOnCriticalPath(){
 		ArrayList<Task> result = new ArrayList<Task>();
 		
-		//TODO
+		//TO DO
 		
 		return result;
 	}
 
 	private void removeScheduledTask(ScheduledTask task) {
-		// TODO Auto-generated method stub
+		// TO DO Auto-generated method stub
 		// Der Task task muss zuerst an seiner Alten Position geloescht werden (und der Predecessor und die SetupDuration des nachfolgeTasks aktualisiert werden)
 		
 	}
@@ -120,37 +134,37 @@ public class Solution {
 
 
 	private void rearrange(ScheduledTask task) {
-		// TODO Auto-generated method stub
-		/*
-		 *  the task can be excecuted or set up earlier
-		 *  this method does this
-		 */
+		// TO DO Auto-generated method stub
 		
+		 //  the task can be excecuted or set up earlier
+		 //  this method does this
+		 		
 	}
 
 
 	private boolean isRearrangable(ScheduledTask task) {
-		// TODO Auto-generated method stub
-		/*
-		 * Returns true if the task could be excecuted or set up earlier
-		 */
+		// TO DO Auto-generated method stub
+		
+		 // Returns true if the task could be excecuted or set up earlier
+		 
 		return false;
 	}
 
 
 	private boolean isValidPosition(Task task, int newPredecessor, Machine m) {
-		// TODO Auto-generated method stub
-		/*
-		 * Returns true if the task could be inserted in given position
-		 */
+		// TO DO Auto-generated method stub
+		
+		 // Returns true if the task could be inserted in given position
+		 
 		// Wenn die Nachfolgetasks des Jobs von Task auf dieser Maschine vorher ausgefuehrt werden : false
 		return false;
 	}
 
 	public void changeWorker() {
-		//TODO
+		//TO DO
 	}
 
+	*/
 	public void addScheduledTask(Task t, Machine m, Worker w) throws SetupDurationNotFoundException, ScheduledTaskByTaskNumberException {
 		ScheduledTask input = new ScheduledTask(t, w, m);
 		input.setPredecessor(getPredecessor(m));
@@ -420,9 +434,36 @@ public class Solution {
 		 * Job mit most Work Remaining bestimmen
 		 * Assignable Task dieses Jobs returnen
 		 */
-		Job job = getMostWorkRemaining();
+		int i = 1;
+		Job job = null;
+				
+		switch (i) {
+		case 1:
+			job = getMostWorkRemaining();
+			break;
+		case 2:
+
+			ArrayList<Job> jobs = getNonCompleteJobs();
+			Random randomGenerator = new Random();
+			int index = randomGenerator.nextInt(jobs.size());
+			job = jobs.get(index);
+			break;
+		default:
+			job = getMostWorkRemaining();
+		}
 		return getAssignableTasks(job);
 	}
+
+	private ArrayList<Job> getNonCompleteJobs() {
+		ArrayList<Job> result = new ArrayList<Job>();
+		for(Job job : problem.getJobs()) {
+			if(!isAssigned(job.getTasks().get(job.getTasks().size()-1))) {
+				result.add(job);
+			}
+		}
+		return result;
+	}
+
 
 	private Task getAssignableTasks(Job job) {
 		ArrayList<Task> remainingTasks = getRemainingTasks();
@@ -532,6 +573,31 @@ public class Solution {
 		return result;
 	}
 
+	public ArrayList<ArrayList<Task>> getTaskOrder() {
+		return taskOrder;
+	}
+
+	public void setTaskOrder(ArrayList<ArrayList<Task>> taskOrder) {
+		this.taskOrder = taskOrder;
+	}
+
+	public int findBestNeighbor() {
+		int makespan = getMakespan();
+		int bestPosition;
+		for (Task task : getCriticalTasks()) {
+			for (Tuple position : getInsertPositions(task)) {
+				int newMakespan = getMakespan(position);
+				if (newMakespan < makespan) {
+					makespan = newMakespan;
+					bestPosition=position;
+				}
+			}
+		}
+		applyBestPosition(bestPosition);
+		return getMakespan();
+	}
+
+	
 
 	
 }
