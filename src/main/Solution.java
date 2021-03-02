@@ -15,6 +15,7 @@ public class Solution {
 	private ArrayList<ArrayList<ScheduledTask>> scheduledMachines;
 	private ArrayList<Task> allTasks;
 	private ArrayList<ArrayList<Task>> taskOrder;
+	private ArrayList<Task> checkedTasks;
 	
 	//First time
 	public Solution(ProblemDetails problem) {
@@ -27,6 +28,10 @@ public class Solution {
 		this.problem=solution.getProblem();
 		initialize(problem);	
 		this.taskOrder=solution.getTaskOrder();
+		this.scheduledMachines=solution.getScheduledMachines();
+		this.allTasks=solution.getAllTasks();
+		this.taskOrder=solution.getTaskOrder();
+		this.checkedTasks=new ArrayList<Task>();
 	}
 	
 	private void initialize(ProblemDetails problem) {
@@ -434,7 +439,7 @@ public class Solution {
 		 * Job mit most Work Remaining bestimmen
 		 * Assignable Task dieses Jobs returnen
 		 */
-		int i = 1;
+		int i = 2;
 		Job job = null;
 				
 		switch (i) {
@@ -581,20 +586,386 @@ public class Solution {
 		this.taskOrder = taskOrder;
 	}
 
-	public int findBestNeighbor() {
+	public int findBestNeighbor() throws ScheduledTaskByTaskNumberException {
 		int makespan = getMakespan();
-		int bestPosition;
+		Task switchedTask = null;
+		Tuple bestPosition = null;
 		for (Task task : getCriticalTasks()) {
 			for (Tuple position : getInsertPositions(task)) {
 				int newMakespan = getMakespan(position);
 				if (newMakespan < makespan) {
 					makespan = newMakespan;
 					bestPosition=position;
+					switchedTask=task;
 				}
 			}
 		}
-		applyBestPosition(bestPosition);
+		applyBestPosition(bestPosition,switchedTask);
 		return getMakespan();
+	}
+
+	private void applyBestPosition(Tuple bestPosition, Task switchedTask) {
+		if(bestPosition==null || switchedTask==null) {
+			// TODO nichts? 
+		}
+		
+		/*
+		 * ScheduledMachines loeschen
+		 * 
+		 */
+		
+		taskOrder = getNewTaskOrder(bestPosition, switchedTask);
+		deleteSchedule();
+		createSchedule(taskOrder);
+			
+		
+	}
+
+	private void createSchedule(ArrayList<ArrayList<Task>> taskOrder2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private ArrayList<ArrayList<Task>> getNewTaskOrder(Tuple bestPosition, Task switchedTask) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private void deleteSchedule() {
+		scheduledMachines = new ArrayList<ArrayList<ScheduledTask>>(problem.getMachineCount());
+		for(int i = 0; i < problem.getMachineCount(); i++) {
+			scheduledMachines.add(new ArrayList<ScheduledTask>());
+		}
+	}
+
+	private int getMakespan(Tuple position) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	private ArrayList<Tuple> getInsertPositions(Task task) throws ScheduledTaskByTaskNumberException {
+		ArrayList<Tuple> positions = new ArrayList<Tuple>();
+		ArrayList<Tuple> temp = new ArrayList<Tuple>();
+		
+		// TODO 
+		/*
+		 * getAllPossible Positions
+		 * For each Possible Position Check Viable
+		 */
+		positions = getAllInsertPositions();
+		for (Tuple position : positions) {
+			if(!isViablePosition(position, task)) {
+				temp.add(position);
+			}
+		}
+		
+		positions.removeAll(temp);
+		
+		return positions;
+	}
+
+	private boolean isViablePosition(Tuple position, Task task) throws ScheduledTaskByTaskNumberException {
+				
+		ArrayList<ArrayList<Task>> newTaskOrder = new ArrayList<ArrayList<Task>>();
+		int i =0;
+		for (ArrayList<Task> tasks : taskOrder) {
+			newTaskOrder.add(new ArrayList<Task>());
+			for(Task taski : tasks) {
+				newTaskOrder.get(i).add(taski);
+			}
+			i++;
+		}
+		
+		// Task entfernen und an neuer Position einsetzen
+		newTaskOrder.get(getScheduledTaskByTask(task).getMachine().getMachineNumber()).remove(task);
+		
+		newTaskOrder.get(position.getMachineNumber()).add(position.getPosition(), task);
+		
+		// is newTaskOrder now viable?
+		// 1. Check Job predecessors
+		// 2. Check Loops
+		
+		if(!checkPredecessors(newTaskOrder,position,task)) {
+			return false;
+		}
+		
+		if(createsLoop(newTaskOrder,position,task)) {
+			return false;
+		}
+		
+		return true;
+	}
+
+	private boolean createsLoop(ArrayList<ArrayList<Task>> newTaskOrder, Tuple position, Task task) {
+		//Returns true if new position creates loop
+		//TODO ueberdenken
+		
+		ArrayList<Task> dependentTasks = new ArrayList<Task>();
+		dependentTasks=getdependentTasks(newTaskOrder,task);
+		
+		for(Task dependentTask : dependentTasks) {
+			if(dependentTask.getJobNumber()==task.getJobNumber()) {
+				if(dependentTask.getTaskNumberInJob()>=task.getTaskNumberInJob()) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	private ArrayList<Task> getdependentTasks(ArrayList<ArrayList<Task>> newTaskOrder, Task task) {
+		ArrayList<Task> result = new ArrayList<Task>();
+		
+		ArrayList<Task> predecessorsOnMachine = getPredecessorsOnMachine(newTaskOrder, task);
+		if (predecessorsOnMachine.isEmpty()) {
+			return result;
+		}
+		result.addAll(predecessorsOnMachine);
+		for(Task predecessorOnMachine : predecessorsOnMachine) {
+			if (predecessorOnMachine.getTaskNumberInJob()!=0) {
+				Task predecessor = getDirectPredecessor(newTaskOrder, predecessorOnMachine);
+				result.addAll(getdependentTasks(newTaskOrder, predecessor));
+			}
+		}
+		
+		return result;
+	}
+
+	private Task getDirectPredecessor(ArrayList<ArrayList<Task>> newTaskOrder, Task task) {
+		return getTaskByTaskNumber(task.getTaskNumber()-1);
+	}
+
+	private ArrayList<Task> getPredecessorsOnMachine(ArrayList<ArrayList<Task>> newTaskOrder, Task task) {
+		ArrayList<Task> result = new ArrayList<Task>();
+		
+		Tuple position = getPositionByTask(newTaskOrder, task);
+		
+		ArrayList<Task> tasks = newTaskOrder.get(position.getMachineNumber());
+				
+		for(int i = 0; i<position.getPosition(); i++) {
+			result.add(tasks.get(i));
+		}
+		
+		
+		return result;
+	}
+
+	private Tuple getPositionByTask(ArrayList<ArrayList<Task>> newTaskOrder, Task task) {
+		int i = 0;
+		int j = 0;
+		for(ArrayList<Task> tasks: newTaskOrder) {
+			for(Task taski : tasks) {
+				if(taski.getTaskNumber()==task.getTaskNumber()) {
+					return new Tuple(i, j);
+				}
+				j++;
+			}
+			i++;
+		}
+		return new Tuple(i, j);
+	}
+
+	private boolean checkPredecessors(ArrayList<ArrayList<Task>> newTaskOrder, Tuple position, Task task) {
+		// returns false, wenn hinter der neuen Einfügeposition Vorgänger des Tasks kommen
+		ArrayList<Tuple> laterPositions = getLaterPositionsOnMachine(newTaskOrder,position);
+		for(Tuple questioningPosition: laterPositions) {
+			Task follower = getTaskByTuple(questioningPosition, newTaskOrder);
+			if(follower.getJobNumber()==task.getJobNumber()) {
+				if(follower.getTaskNumberInJob()<task.getTaskNumberInJob()) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private Task getTaskByTuple(Tuple position, ArrayList<ArrayList<Task>> newtaskOrder) {
+		return newtaskOrder.get(position.getMachineNumber()).get(position.getPosition());
+	}
+
+	private ArrayList<Tuple> getLaterPositionsOnMachine(ArrayList<ArrayList<Task>> newTaskOrder, Tuple position) {
+		ArrayList<Tuple> result = new ArrayList<Tuple>();
+		ArrayList<Task> machine = newTaskOrder.get(position.getMachineNumber());
+		for(int i=position.getPosition()+1; i < machine.size();i++) {
+			result.add(new Tuple(position.getMachineNumber(),i));
+			
+		}
+		return result;
+	}
+
+	private ArrayList<Tuple> getAllInsertPositions() {
+		ArrayList<Tuple> positions = new ArrayList<Tuple>();
+		int machineCount = 0;
+		int position = 0;
+		for(ArrayList<ScheduledTask> machine : scheduledMachines) {
+			positions.add(new Tuple(machineCount,position));
+			position++;
+			for(@SuppressWarnings("unused") ScheduledTask task : machine) {
+				positions.add(new Tuple(machineCount,position));
+				position++;
+			}
+			position=0;
+			machineCount++;
+		}
+		
+		return positions;
+	}
+
+	private ArrayList<Task> getCriticalTasks() throws ScheduledTaskByTaskNumberException {
+		ArrayList<Task> result = new ArrayList<Task>();
+		int makespan = getMakespan();
+		Task task = getTaskByEndTime(makespan);
+		//Solange es noch weitere Tasks gibt
+		while (task!=null) {
+			result.add(task);
+			ScheduledTask scheduledTask = getScheduledTaskByTask(task);
+			
+			if(scheduledTask.getTaskStartTime()==scheduledTask.getSetupEndTime()) {
+				if(getPositionOnMachine(scheduledTask.getTask())>0) {
+					ScheduledTask scheduledPredecessor = getScheduledTaskByTask(getPredecessorOnMachine(scheduledTask.getTask()));
+					if(scheduledTask.getSetupStartTime()==scheduledPredecessor.getTaskEndTime()) {
+						task=scheduledPredecessor.getTask();
+					} else {
+						task = getLastTaskByWorker(scheduledTask);
+					}
+				} else {
+					if (scheduledTask.getSetupStartTime()!=0) {
+						task = getLastTaskByWorker(scheduledTask);
+					} else {
+						task = null;
+					}
+				}
+			} else {
+				// CP ist letzter Task im selben Job CASE 2
+				if (task.getTaskNumberInJob()>0) {
+					task = getTaskByTaskNumber(task.getTaskNumber()-1);
+				} else {
+					task = null;
+				}
+			}
+			
+			
+			/*
+			if(getScheduledTaskByTaskNumber(task.getTaskNumber()).getSetupEndTime()==getScheduledTaskByTaskNumber(task.getTaskNumber()).getTaskStartTime()) {
+				// Wenn KEINE Differenz zwischen Setup und Processing Time (CP auf Maschine oder durch Worker verursacht)
+				ScheduledTask predecessor = getScheduledTaskByTaskNumber(getPredecessorOnMachine(task).getTaskNumber());
+				if (predecessor != null ) {
+					
+					if (getPositionOnMachine(task) > 0) {
+
+					} else {
+						task = null;
+					} 
+				}
+			} else {
+				// CP ist letzter Task im selben Job CASE 2
+				if (task.getTaskNumberInJob()>0) {
+					task = getTaskByTaskNumber(task.getTaskNumber()-1);
+				} else {
+					task = null;
+				}
+				
+			}
+			*/
+			
+		}
+		
+		return result;
+	}
+	
+	
+
+	private Task getLastTaskByWorker(ScheduledTask scheduledTask) {
+		Task result = null;
+		
+		ArrayList<ScheduledTask> tasks = getAllScheduledTasksWithSameWorkerByScheduledTask(scheduledTask);
+		tasks.remove(scheduledTask);
+		int time = scheduledTask.getSetupStartTime();
+		int i = 0;
+		for(ScheduledTask task : tasks) {
+			if(task.getSetupEndTime()<=time && task.getSetupStartTime()>=i) {
+				result=task.getTask();
+				i=task.getSetupEndTime();
+			}
+		}
+		
+		return result;
+	}
+
+	private ArrayList<ScheduledTask> getAllScheduledTasksWithSameWorkerByScheduledTask(ScheduledTask scheduledTask) {
+		ArrayList<ScheduledTask> result = new ArrayList<ScheduledTask>();
+		for(ArrayList<ScheduledTask> tasks: scheduledMachines) {
+			for(ScheduledTask task : tasks) {
+				if (task.getWorker().getWorkerNumber()==scheduledTask.getWorker().getWorkerNumber()) {
+					result.add(task);
+				}
+			}
+		}
+		return result;
+	}
+
+	private ScheduledTask getScheduledTaskByTask(Task task) throws ScheduledTaskByTaskNumberException {
+		return getScheduledTaskByTaskNumber(task.getTaskNumber());
+	}
+
+	private Task getPredecessorOnMachine(Task task) throws ScheduledTaskByTaskNumberException {
+		Task result = null;
+		
+		if(getPositionOnMachine(task)!=0) {
+			return getScheduledMachineByTask(task).get(getScheduledMachineByTask(task).indexOf(getScheduledTaskByTaskNumber(task.getTaskNumber()))-1).getTask();
+		}
+		
+		return result;
+	}
+
+	private int getPositionOnMachine(Task task) {
+		int i = 0;
+		ArrayList<ScheduledTask> machine = getScheduledMachineByTask(task);
+		
+		for(ScheduledTask scheduledTask : machine) {
+			if (scheduledTask.getTask().getTaskNumber()==task.getTaskNumber()) {
+				return i;
+			}
+			i++;
+		}
+		
+		return i;
+	}
+
+	private ArrayList<ScheduledTask> getScheduledMachineByTask(Task task) {
+		ArrayList<ScheduledTask> result = null;
+		if(task == null) {
+			return null;
+		}
+		for (ArrayList<ScheduledTask> machine : scheduledMachines) {
+			for(ScheduledTask scheduledTask : machine) {
+				if (scheduledTask.getTask().getTaskNumber()==task.getTaskNumber()) {
+					return machine;
+				}
+			}
+		}
+		return result;
+	}
+
+	private Task getTaskByTaskNumber(int i) {
+		for (Task t : allTasks) {
+			if (t.getTaskNumber()==i) {
+				return t;
+			}
+		}
+		return null;
+	}
+
+	private Task getTaskByEndTime(int makespan) {
+		for(ArrayList<ScheduledTask> tasks : scheduledMachines) {
+			for (ScheduledTask task : tasks) {
+				if (task.getTaskEndTime()==makespan){
+					return task.getTask();
+				}
+			}
+		}
+		return null;
 	}
 
 	

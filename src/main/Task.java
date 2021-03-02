@@ -92,6 +92,16 @@ public class Task {
 		}
 		return i;
 	}
+
+	public int getTaskNumberInJob() {
+		return taskNumberInJob;
+	}
+
+	public void setTaskNumberInJob(int taskNumberInJob) {
+		this.taskNumberInJob = taskNumberInJob;
+	}
+	
+	
 	
 
 }

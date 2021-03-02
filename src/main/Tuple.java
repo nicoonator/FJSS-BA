@@ -2,18 +2,18 @@ package main;
 
 public class Tuple {
 	
-	Machine machine;
-	int position;
+	private int machineNumber;
+	private int position;
 	
-	public Tuple(Machine machine, int position) {
-		this.machine = machine;
+	public Tuple(int machine, int position) {
+		this.machineNumber = machine;
 		this.position = position;
 	}
-	public Machine getMachine() {
-		return machine;
+	public int getMachineNumber() {
+		return machineNumber;
 	}
-	public void setMachine(Machine machine) {
-		this.machine = machine;
+	public void setMachineNumber(int machine) {
+		this.machineNumber = machine;
 	}
 	public int getPosition() {
 		return position;
