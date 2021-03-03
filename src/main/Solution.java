@@ -439,7 +439,7 @@ public class Solution {
 		 * Job mit most Work Remaining bestimmen
 		 * Assignable Task dieses Jobs returnen
 		 */
-		int i = 2;
+		int i = 1;
 		Job job = null;
 				
 		switch (i) {
@@ -676,6 +676,14 @@ public class Solution {
 			i++;
 		}
 		
+		// Wenn die neue Position die letzte an der Maschine aus der der Task entnommen wird ist, dann false
+		
+		if (position.getMachineNumber() == getScheduledTaskByTask(task).getMachine().getMachineNumber()) {
+			if(isLastPositionOnMachine(position)) {
+				return false;
+			}		
+		}
+		
 		// Task entfernen und an neuer Position einsetzen
 		newTaskOrder.get(getScheduledTaskByTask(task).getMachine().getMachineNumber()).remove(task);
 		
@@ -696,10 +704,39 @@ public class Solution {
 		return true;
 	}
 
+	private boolean isLastPositionOnMachine(Tuple position) {
+		// returns true if position is last position on its machine
+		if(scheduledMachines.get(position.getMachineNumber()).size()==position.getPosition()) {
+			return true;
+		}
+		return false;
+	}
+
 	private boolean createsLoop(ArrayList<ArrayList<Task>> newTaskOrder, Tuple position, Task task) {
 		//Returns true if new position creates loop
 		//TODO ueberdenken
 		
+		// Wenn ein Task eingeplant wird, müssen seine Vorgänger (Jobbezogen) erreichbar sein.
+		
+		ArrayList<Task> jobPredecessors = getjobPredecessorsByTask(task);		
+		
+		if(!jobPredecessors.isEmpty()) {
+			/*
+			 * WENN Unter den Job_Nachfolgern des Tasks solche Tasks existieren
+			 * die Maschinen-Vorgänger der Maschinen-Vorgänger des eingefügten Tasks sind
+			 */
+			ArrayList<Task> jobSucessors = getJobSucessors(task);
+			ArrayList<Task> machinePredecessors = getMachinePredecessors(newTaskOrder, position);
+			for (Task jobSuccessor : jobSucessors) {
+				ArrayList<Task> machineSuccessorsOfJobSuccessor = getMachineSuccessorOfJobSuccessor(newTaskOrder,jobSuccessor);
+				// Wenn machineSuccessorsOfJobSuccessor has Predecessor of machinePredecessor
+				for(Task machinePredecessor : machinePredecessors) {
+					if(hasPredecessorOfMachinePredecessor(machineSuccessorsOfJobSuccessor,machinePredecessor));
+				}
+			}
+		}
+		
+		/*
 		ArrayList<Task> dependentTasks = new ArrayList<Task>();
 		dependentTasks=getdependentTasks(newTaskOrder,task);
 		
@@ -710,8 +747,67 @@ public class Solution {
 				}
 			}
 		}
+		*/
+		
 		
 		return false;
+	}
+
+	private ArrayList<Task> getJobSucessors(Task task) {
+		ArrayList<Task> result = new ArrayList<Task>();
+		
+		for (int i = task.getTaskNumberInJob()+1; i <= problem.getJobs()[task.getJobNumber()].getTasks().size()-1 ; i++) {
+			result.add(problem.getJobs()[task.getJobNumber()].getTasks().get(i));
+		}
+		
+		return result;
+	}
+
+	private ArrayList<Task> getMachinePredecessors(ArrayList<ArrayList<Task>> newTaskOrder, Tuple position) {
+		ArrayList<Task> result = new ArrayList<Task>();
+		
+		for(int i=0 ; i<position.getPosition()-1;i++) {
+			result.add(newTaskOrder.get(position.getMachineNumber()).get(i));
+		}
+		
+		return result;
+	}
+
+	private ArrayList<Task> getMachineSuccessorOfJobSuccessor(ArrayList<ArrayList<Task>> newTaskOrder,
+			Task jobSuccessor) {
+		Tuple position = getPositionByTask(newTaskOrder, jobSuccessor);
+		ArrayList<Task> result = new ArrayList<Task>();
+		
+		for(int i=position.getPosition()+1 ; i<newTaskOrder.get(position.getMachineNumber()).size()-1;i++) {
+			result.add(newTaskOrder.get(position.getMachineNumber()).get(i));
+		}
+		
+		return result;
+	}
+
+	private boolean hasPredecessorOfMachinePredecessor(ArrayList<Task> machineSuccessorsOfJobSuccessor,
+			Task machinePredecessor) {
+		// Returns true if Array list contains a Predecessor of machinePredecessor
+		
+		for(Task machineSuccessor : machineSuccessorsOfJobSuccessor) {
+			if(machineSuccessor.getJobNumber()==machinePredecessor.getJobNumber()) {
+				if(machineSuccessor.getTaskNumberInJob() < machinePredecessor.getTaskNumberInJob()) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	private ArrayList<Task> getjobPredecessorsByTask(Task task) {
+		ArrayList<Task> result = new ArrayList<Task>();
+		for(int i = 0; i < task.getTaskNumberInJob(); i++) {
+			result.add(problem.getJobs()[task.getJobNumber()].getTasks().get(i));
+		}
+		
+		
+		return result;
 	}
 
 	private ArrayList<Task> getdependentTasks(ArrayList<ArrayList<Task>> newTaskOrder, Task task) {
