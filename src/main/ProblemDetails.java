@@ -7,9 +7,13 @@ public class ProblemDetails {
 	private Worker[] workers;
 	private Job[] jobs;
 	private Machine[] machines;
+	private int seed;
 	
 	public ProblemDetails() {
 		
+	}
+	public ProblemDetails(int seed) {
+		this.seed=seed;
 	}
 	
 	public void createJobs() {

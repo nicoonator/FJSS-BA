@@ -5,14 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 import Exceptions.ScheduledTaskByTaskNumberException;
 import Exceptions.SetupDurationNotFoundException;
 
 public class Head {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SetupDurationNotFoundException {
 		
 		InstanceReader instanceReader = new InstanceReader();
 		Solver solver = new Solver();
@@ -24,32 +23,43 @@ public class Head {
 		String result="";
 		String data="";
 
-		for(int problems =0; problems<3000;problems++) {
+		for(int problems =2000; problems<3000;problems++) {
 			problem=createProblem(problems);
 		
+			/*if(problems==2003) {
+				System.out.println("Test");
+			}*/
 		
 		try {
 			data+= new SimpleDateFormat("HH:mm:ss").format(new Date());
 			data+=",";
 			Solution initialSolution = solver.createInitialSolution(problem);
-			result+="This is the initial Solution:"+System.getProperty("line.separator");
-			result+=initialSolution.print()+System.getProperty("line.separator")+System.getProperty("line.separator");
+			result+="This is the initial Solution:";
+			//result+=initialSolution.print()+System.getProperty("line.separator")+System.getProperty("line.separator");
 			data+=initialSolution.getMakespan();
+			result+=initialSolution.getMakespan()+System.getProperty("line.separator");
 			data+=",";
 			//result.concat(System.getProperty("line.separator"));
 			
 			Solution finalSolution = solver.useHeuristik();
-			result+="This is the final Solution:"+System.getProperty("line.separator");
-			result+=finalSolution.print()+System.getProperty("line.separator");
+			result+="This is the final Solution:";
+			//result+=finalSolution.print()+System.getProperty("line.separator");
 			data+=finalSolution.getMakespan();
+			result+=finalSolution.getMakespan();
+					
+			data+=",";
+			data+= new SimpleDateFormat("HH:mm:ss").format(new Date());
 			
 			
-		} catch (SetupDurationNotFoundException | ScheduledTaskByTaskNumberException e) {
+			data+=System.getProperty("line.separator");
+			
+			
+		} catch ( ScheduledTaskByTaskNumberException e) {
 			System.out.println(e.getMessage());
 		} 
 		
 		System.out.println(result);
-		
+		System.out.println(problems);
 		}
 		
 		try {
@@ -108,7 +118,7 @@ public class Head {
 		int setupTimeUpperBound=4;
 		
 				
-		return generateProblem(machineAmount,jobAmount,workerAmount,tasksPerJobLowerBound,tasksPerJobUpperBound,eligebleMachinesPerTaskLowerBound,eligebleMachinesPerTaskUpperBound,processingTimeRangeLowerBound,processingTimeRangeUpperBound,setupTimeLowerBound,setupTimeUpperBound,random,eligebleMachinesPerWorkerLowerBound,eligebleMachinesPerWorkerUpperBound);
+		return generateProblem(machineAmount,jobAmount,workerAmount,tasksPerJobLowerBound,tasksPerJobUpperBound,eligebleMachinesPerTaskLowerBound,eligebleMachinesPerTaskUpperBound,processingTimeRangeLowerBound,processingTimeRangeUpperBound,setupTimeLowerBound,setupTimeUpperBound,random,eligebleMachinesPerWorkerLowerBound,eligebleMachinesPerWorkerUpperBound,seed);
 	}
 
 	private static ProblemDetails createMediumProblem(int seed) {
@@ -142,7 +152,7 @@ public class Head {
 		int setupTimeLowerBound=1;
 		int setupTimeUpperBound=7;
 		
-		return generateProblem(machineAmount,jobAmount,workerAmount,tasksPerJobLowerBound,tasksPerJobUpperBound,eligebleMachinesPerTaskLowerBound,eligebleMachinesPerTaskUpperBound,processingTimeRangeLowerBound,processingTimeRangeUpperBound,setupTimeLowerBound,setupTimeUpperBound,random,eligebleMachinesPerWorkerLowerBound,eligebleMachinesPerWorkerUpperBound);
+		return generateProblem(machineAmount,jobAmount,workerAmount,tasksPerJobLowerBound,tasksPerJobUpperBound,eligebleMachinesPerTaskLowerBound,eligebleMachinesPerTaskUpperBound,processingTimeRangeLowerBound,processingTimeRangeUpperBound,setupTimeLowerBound,setupTimeUpperBound,random,eligebleMachinesPerWorkerLowerBound,eligebleMachinesPerWorkerUpperBound,seed);
 	}
 
 	private static ProblemDetails createLargeProblem(int seed) {
@@ -153,7 +163,7 @@ public class Head {
 				 * Worker 12-20
 				 * 
 				 * tasks per Job 4-10
-				 * eligeble machines per Task 8-22
+				 * eligeble machines per Task 8-32
 				 * eligeble machines per Task 4-7
 				 * Processing time range 5-15
 				 * setup time range 1-10
@@ -176,7 +186,7 @@ public class Head {
 		int setupTimeLowerBound=1;
 		int setupTimeUpperBound=10;
 		
-		return generateProblem(machineAmount,jobAmount,workerAmount,tasksPerJobLowerBound,tasksPerJobUpperBound,eligebleMachinesPerTaskLowerBound,eligebleMachinesPerTaskUpperBound,processingTimeRangeLowerBound,processingTimeRangeUpperBound,setupTimeLowerBound,setupTimeUpperBound,random,eligebleMachinesPerWorkerLowerBound,eligebleMachinesPerWorkerUpperBound);
+		return generateProblem(machineAmount,jobAmount,workerAmount,tasksPerJobLowerBound,tasksPerJobUpperBound,eligebleMachinesPerTaskLowerBound,eligebleMachinesPerTaskUpperBound,processingTimeRangeLowerBound,processingTimeRangeUpperBound,setupTimeLowerBound,setupTimeUpperBound,random,eligebleMachinesPerWorkerLowerBound,eligebleMachinesPerWorkerUpperBound, seed);
 	}
 
 	
@@ -186,14 +196,15 @@ public class Head {
 	private static ProblemDetails generateProblem(int machineAmount, int jobAmount, int workerAmount,
 			int tasksPerJobLowerBound, int tasksPerJobUpperBound, int eligebleMachinesPerTaskLowerBound,
 			int eligebleMachinesPerTaskUpperBound, int processingTimeRangeLowerBound, int processingTimeRangeUpperBound,
-			int setupTimeLowerBound, int setupTimeUpperBound, Random random, int eligebleMachinesPerWorkerLowerBound, int eligebleMachinesPerWorkerUpperBound) {
+			int setupTimeLowerBound, int setupTimeUpperBound, Random random, int eligebleMachinesPerWorkerLowerBound, int eligebleMachinesPerWorkerUpperBound, int seed) {
 		// TODO Auto-generated method stub
 		
 		//TODO
 		int q=0;
 		
 		
-		ProblemDetails problem = new ProblemDetails();
+		//init
+		ProblemDetails problem = new ProblemDetails(seed);
 		
 		problem.setMachineCount(machineAmount);
 		problem.setJobCount(jobAmount);
@@ -202,6 +213,8 @@ public class Head {
 		problem.createMachines();
 		problem.createJobs();
 		
+		
+		// Available Workers
 		for (int workerNumber = 0; workerNumber < workerAmount; workerNumber++) {
 			int eligebleMachineAmountForWorker;
 			if (!(eligebleMachinesPerWorkerUpperBound == eligebleMachinesPerWorkerLowerBound)) {
@@ -210,6 +223,9 @@ public class Head {
 						+ eligebleMachinesPerWorkerLowerBound;
 			} else {
 				eligebleMachineAmountForWorker=eligebleMachinesPerWorkerLowerBound;
+			}
+			if(eligebleMachineAmountForWorker>machineAmount) {
+				eligebleMachineAmountForWorker=machineAmount;
 			}
 			ArrayList<Integer> machines = new ArrayList<Integer>();
 			while (machines.size()!=eligebleMachineAmountForWorker) {
@@ -232,13 +248,134 @@ public class Head {
 			}
 		}
 		
+		//Tasks
+		int taskNumber=0;
+		for(Job job : problem.getJobs()) {
+			int taskAmount = random.nextInt(tasksPerJobUpperBound-tasksPerJobLowerBound)+tasksPerJobLowerBound;
+			for (int taskNumberInJob=0; taskNumberInJob<taskAmount;taskNumberInJob++) {
+				problem.getJobs()[job.getJobNumber()].addTask(new Task(taskNumber,taskNumberInJob));
+				taskNumber++;
+			}
+		}
 		
+		//AllowedMachinesOfTask
+		for(Job job :problem.getJobs()) {
+			for(Task task : job.getTasks()) {
+				int eligebleMachineAmountForTask;
+				if (!(eligebleMachinesPerTaskUpperBound == eligebleMachinesPerTaskLowerBound)) {
+					eligebleMachineAmountForTask = random
+							.nextInt(eligebleMachinesPerTaskUpperBound - eligebleMachinesPerTaskLowerBound)
+							+ eligebleMachinesPerTaskLowerBound;
+				} else {
+					eligebleMachineAmountForTask=eligebleMachinesPerTaskUpperBound;
+				}
+				if(eligebleMachineAmountForTask>machineAmount) {
+					eligebleMachineAmountForTask=machineAmount;
+				}
+				ArrayList<Integer> machines = new ArrayList<Integer>();
+				while (machines.size()!=eligebleMachineAmountForTask) {
+					int randomMachine = random.nextInt(machineAmount);
+					if(!machines.contains(randomMachine)) {
+						machines.add(randomMachine);
+					}
+				}
+				for (int machineNumber : machines) {
+					task.addAllowedMachine(problem.getMachines()[machineNumber]);
+				}
+			}
+		}
+		
+		//ProcessingTimes of Task
+		
+		for(Job job : problem.getJobs()) {
+			for(Task task : job.getTasks()) {
+				for(int m=0; m<task.getAllowedMachines().size();m++) {
+					int processingtime = random.nextInt(processingTimeRangeUpperBound-processingTimeRangeLowerBound)+processingTimeRangeLowerBound;
+					task.addProcessingTime(processingtime, m);
+				}
+			}
+		}
+		
+		//SetupTimes of Task
+		for(Job job : problem.getJobs()) {
+			for(Task task : job.getTasks()) {
+				ArrayList<Constellation> relevantConstellations=getRelevantConstellations(task,problem);
+				while(!relevantConstellations.isEmpty()) {
+					int setupTime = random.nextInt(setupTimeUpperBound-setupTimeLowerBound)+setupTimeLowerBound;
+					addSetupTime(relevantConstellations.get(0), setupTime,problem);
+					relevantConstellations.remove(0);
+				}
+			}
+		}
+				
 		return problem;
 	}
+	
+	private static void addSetupTime(Constellation constellation, int time, ProblemDetails problem) {
+		int tasknumber = constellation.getTask();
+		Task task = getTaskByTasknumber(tasknumber,problem);
+		task.addSetupTime(constellation, time);
+	}
+	
+	private static Task getTaskByTasknumber(int tasknumber, ProblemDetails problem) {
+		Task result = null;
+		
+		for (Job job : problem.getJobs()) {
+			for (Task task : job.getTasks()) {
+				if (task.getTaskNumber()==tasknumber) {
+					return task;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	private static ArrayList<Constellation> getRelevantConstellations(Task aktuellerTask, ProblemDetails problem) {
+		ArrayList<Constellation> result = new ArrayList<Constellation>();
+		
+
+		
+		// Erster Worker und erste Maschine des Tasks holen
+		for (Machine m : aktuellerTask.getAllowedMachines()) {
+			for (Worker w : m.getAllowedWorkers()) {
+				result.add(new Constellation(aktuellerTask.getTaskNumber(),w,m));
+				for (Task pre : getRelevantTasks(aktuellerTask, m, problem)) {
+					result.add(new Constellation(aktuellerTask.getTaskNumber(),w,m,pre.getTaskNumber()));
+				} 
+			}
+		}
+		
+		
+		return result;
+	}
+	
+	// Alle Tasks die auf der Maschine m ausgeführt werden können und nicht nach dem Aktuellen Task kommen
+		private static ArrayList<Task> getRelevantTasks(Task aktuellerTask, Machine m, ProblemDetails problem) {
+			ArrayList<Task> result = new ArrayList<Task>();
+			
+			for (Job job : problem.getJobs()) {
+				// Alle Tasks die auf der Maschine m ausgeführt werden können
+				for (Task t : job.getTasks()) {
+					if (t.getAllowedMachines().contains(m)) {
+						//Wenn der Tasks  auf dem Selben Job an früherer Position kommt
+						if (t.getJobNumber() == aktuellerTask.getJobNumber()) {
+							if (t.getTaskNumber() < aktuellerTask.getTaskNumber()) {
+								result.add(t);
+							}
+						} else {
+							result.add(t);
+						}
+					}
+				} 
+			}
+			return result;
+		}
+
 
 	public static void writeToFile(String data) 
 			  throws IOException {
-			    FileWriter fileWriter = new FileWriter("Files/result.txt");
+			    FileWriter fileWriter = new FileWriter("Files/result3.txt");
 			    PrintWriter printWriter = new PrintWriter(fileWriter);
 			    printWriter.print(data);
 			    printWriter.close();
