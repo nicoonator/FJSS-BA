@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Map;
 
-import Exceptions.NotAValidPositionException;
 import Exceptions.ScheduledTaskByTaskNumberException;
 import Exceptions.SetupDurationNotFoundException;
 
@@ -16,7 +15,6 @@ public class Solution {
 	private ArrayList<Task> allTasks;
 	private ArrayList<ArrayList<Task>> taskOrder;
 	private ArrayList<ArrayList<Task>> newTaskOrder;
-	private ArrayList<Task> checkedTasks;
 	
 	//First time
 	public Solution(ProblemDetails problem) {
@@ -31,7 +29,6 @@ public class Solution {
 		this.taskOrder=solution.getTaskOrder();
 		this.scheduledMachines=solution.getScheduledMachines();
 		this.allTasks=solution.getAllTasks();
-		this.checkedTasks=new ArrayList<Task>();
 	}
 	
 	
@@ -659,7 +656,6 @@ public class Solution {
 		int makespan = getMakespan();
 		Solution tempSolution =null;
 		Solution bestSolution =null;
-		ArrayList<ArrayList<Task>> bestTaskOrder = null;
 		for (Task task : getCriticalTasks()) {
 			for (Tuple position : getInsertPositions(task)) {
 				newTaskOrder = getNewTaskOrder(task,position);
@@ -667,7 +663,6 @@ public class Solution {
 				int newMakespan = tempSolution.getMakespan();
 				if (newMakespan < makespan) {
 					makespan = newMakespan;
-					bestTaskOrder=newTaskOrder;
 					bestSolution=tempSolution;
 				}
 			}
@@ -679,7 +674,6 @@ public class Solution {
 
 
 	private ArrayList<ArrayList<Task>> getNewTaskOrder(Task task, Tuple position) throws ScheduledTaskByTaskNumberException {
-		// TODO Auto-generated method stub
 		ArrayList<ArrayList<Task>> result = new ArrayList<ArrayList<Task>>();
 		
 		int i =0;
@@ -712,7 +706,6 @@ public class Solution {
 		ArrayList<Tuple> positions = new ArrayList<Tuple>();
 		ArrayList<Tuple> temp = new ArrayList<Tuple>();
 		
-		// TODO 
 		/*
 		 * getAllPossible Positions
 		 * For each Possible Position Check Viable
@@ -791,8 +784,7 @@ public class Solution {
 
 	private boolean createsLoop(ArrayList<ArrayList<Task>> newTaskOrder, Tuple position, Task task) {
 		//Returns true if new position creates loop
-		//TODO ueberdenken
-		
+				
 		// Wenn ein Task eingeplant wird, müssen seine Vorgänger (Jobbezogen) erreichbar sein.
 		
 		ArrayList<Task> jobPredecessors = getjobPredecessorsByTask(task);		
@@ -881,43 +873,6 @@ public class Solution {
 		ArrayList<Task> result = new ArrayList<Task>();
 		for(int i = 0; i < task.getTaskNumberInJob(); i++) {
 			result.add(problem.getJobs()[task.getJobNumber()].getTasks().get(i));
-		}
-		
-		
-		return result;
-	}
-
-	private ArrayList<Task> getdependentTasks(ArrayList<ArrayList<Task>> newTaskOrder, Task task) {
-		ArrayList<Task> result = new ArrayList<Task>();
-		
-		ArrayList<Task> predecessorsOnMachine = getPredecessorsOnMachine(newTaskOrder, task);
-		if (predecessorsOnMachine.isEmpty()) {
-			return result;
-		}
-		result.addAll(predecessorsOnMachine);
-		for(Task predecessorOnMachine : predecessorsOnMachine) {
-			if (predecessorOnMachine.getTaskNumberInJob()!=0) {
-				Task predecessor = getDirectPredecessor(newTaskOrder, predecessorOnMachine);
-				result.addAll(getdependentTasks(newTaskOrder, predecessor));
-			}
-		}
-		
-		return result;
-	}
-
-	private Task getDirectPredecessor(ArrayList<ArrayList<Task>> newTaskOrder, Task task) {
-		return getTaskByTaskNumber(task.getTaskNumber()-1);
-	}
-
-	private ArrayList<Task> getPredecessorsOnMachine(ArrayList<ArrayList<Task>> newTaskOrder, Task task) {
-		ArrayList<Task> result = new ArrayList<Task>();
-		
-		Tuple position = getPositionByTask(newTaskOrder, task);
-		
-		ArrayList<Task> tasks = newTaskOrder.get(position.getMachineNumber());
-				
-		for(int i = 0; i<position.getPosition(); i++) {
-			result.add(tasks.get(i));
 		}
 		
 		

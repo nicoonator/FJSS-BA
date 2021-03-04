@@ -1,7 +1,5 @@
 package main;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.io.*;
 
 import Exceptions.ScheduledTaskByTaskNumberException;
@@ -15,11 +13,12 @@ public class Head {
 		Solver solver = new Solver();
 			
 		ProblemDetails problem = instanceReader.createInstance();
+		
+		//TODO Problems
 	
 		String result="";
 		String data="";
-		int i=0;
-		
+	
 		
 		try {
 			Solution initialSolution = solver.createInitialSolution(problem);
@@ -55,7 +54,7 @@ public class Head {
 			  throws IOException {
 			    FileWriter fileWriter = new FileWriter("Files/result.txt");
 			    PrintWriter printWriter = new PrintWriter(fileWriter);
-			    printWriter.print("data");
+			    printWriter.print(data);
 			    printWriter.close();
 			}
 
