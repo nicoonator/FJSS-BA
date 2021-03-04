@@ -14,7 +14,7 @@ public class Solver {
 	 */
 	
 
-	public Solution useHeuristik() throws ScheduledTaskByTaskNumberException {
+	public Solution useHeuristik() throws ScheduledTaskByTaskNumberException, SetupDurationNotFoundException {
 		//TODO
 				
 		// Extrahiere Taskreihenfolge aus Initial Solution (Teilweise unabhaengig vom Worker) (in Solution als neue Variable?)
@@ -27,7 +27,7 @@ public class Solver {
 		return solution;
 	}
 
-	private void localSearch() throws ScheduledTaskByTaskNumberException {
+	private void localSearch() throws ScheduledTaskByTaskNumberException, SetupDurationNotFoundException {
 		// TODO Auto-generated method stub
 		int makespan = solution.getMakespan();
 		boolean check = true;

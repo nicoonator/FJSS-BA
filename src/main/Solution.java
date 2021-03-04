@@ -15,6 +15,7 @@ public class Solution {
 	private ArrayList<ArrayList<ScheduledTask>> scheduledMachines;
 	private ArrayList<Task> allTasks;
 	private ArrayList<ArrayList<Task>> taskOrder;
+	private ArrayList<ArrayList<Task>> newTaskOrder;
 	private ArrayList<Task> checkedTasks;
 	
 	//First time
@@ -30,10 +31,72 @@ public class Solution {
 		this.taskOrder=solution.getTaskOrder();
 		this.scheduledMachines=solution.getScheduledMachines();
 		this.allTasks=solution.getAllTasks();
-		this.taskOrder=solution.getTaskOrder();
 		this.checkedTasks=new ArrayList<Task>();
 	}
 	
+	
+	public Solution(ArrayList<ArrayList<Task>> taskOrder, ProblemDetails problem) throws SetupDurationNotFoundException, ScheduledTaskByTaskNumberException {
+		this.problem=problem;
+		initialize(problem);
+		for(int i=0; i<=taskOrder.size()-1;i++) {
+			for (int j = 0; j <= taskOrder.get(i).size()-1; j++) {
+				this.taskOrder.get(i).add(taskOrder.get(i).get(j));
+			}
+		}
+				
+		while (!getRemainingTasks().isEmpty()) {
+			Task t = getNextTask(taskOrder);
+			Machine m = getMachineByTask(t);
+			//DEFAULT WORKER SEARCH
+			Worker w = getNextWorker(t,m);
+
+			addScheduledTask(t,m,w);
+		}
+		
+	}
+
+	private Machine getMachineByTask(Task t) {
+		for(int i = 0; i<=taskOrder.size()-1; i++) {
+			for(Task taski : taskOrder.get(i)) {
+				if (taski.getTaskNumber()==t.getTaskNumber()) {
+					return problem.getMachines()[i];
+				}
+			}
+		}
+		return null;
+	}
+
+	private Task getNextTask(ArrayList<ArrayList<Task>> taskOrder) {
+		return getFirstAssignableTask();
+	}
+
+	private Task getFirstAssignableTask() {
+		
+		for(ArrayList<Task> machine : taskOrder) {
+			for(Task scheduledTask: machine) {
+				if (!isAssigned(scheduledTask)) {
+					if (isAssignable(scheduledTask)) {
+						return scheduledTask;
+					} 
+				}
+			}
+		}
+		
+		return null;
+	}
+
+	private boolean isAssignable(Task task) {
+		// Ein Task is Assignable wenn seine Vorgaenger schon zugewiesen worden sind	
+		
+		for(Task predecessor : getjobPredecessorsByTask(task)) {
+			if(!isAssigned(predecessor)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
 	private void initialize(ProblemDetails problem) {
 		scheduledMachines = new ArrayList<ArrayList<ScheduledTask>>(problem.getMachineCount());
 		taskOrder = new ArrayList<ArrayList<Task>>(problem.getMachineCount());
@@ -45,16 +108,22 @@ public class Solution {
 	}
 	
 
-	public void print() {
+	public String print() {
+		
+		String result="";
+				
 		for (int i = 0; i < scheduledMachines.size(); i++) {
 			int j=i+1;
-			System.out.println("Machine "+j+":");
+			result+="Machine "+j+":"+System.getProperty("line.separator");
 			for (ScheduledTask task : scheduledMachines.get(i)) {
-				task.print();
+				result+=task.print();
 			}
-			System.out.println();
+			result+=System.getProperty("line.separator");
 		}
-		System.out.println("Makespan: "+getMakespan());
+		
+		result+="Makespan: "+getMakespan();
+		
+		return result;
 	}
 
 
@@ -439,7 +508,7 @@ public class Solution {
 		 * Job mit most Work Remaining bestimmen
 		 * Assignable Task dieses Jobs returnen
 		 */
-		int i = 1;
+		int i = 2;
 		Job job = null;
 				
 		switch (i) {
@@ -525,7 +594,7 @@ public class Solution {
 
 	public ArrayList<Task> getRemainingTasks() {
 		ArrayList<Task> result = new ArrayList<Task>();
-		for(Task t : allTasks) {
+		for(Task t : getAllTasks()) {
 			if (!isAssigned(t)) {
 				result.add(t);
 			}
@@ -586,62 +655,58 @@ public class Solution {
 		this.taskOrder = taskOrder;
 	}
 
-	public int findBestNeighbor() throws ScheduledTaskByTaskNumberException {
+	public int findBestNeighbor() throws ScheduledTaskByTaskNumberException, SetupDurationNotFoundException {
 		int makespan = getMakespan();
-		Task switchedTask = null;
-		Tuple bestPosition = null;
+		Solution tempSolution =null;
+		Solution bestSolution =null;
+		ArrayList<ArrayList<Task>> bestTaskOrder = null;
 		for (Task task : getCriticalTasks()) {
 			for (Tuple position : getInsertPositions(task)) {
-				int newMakespan = getMakespan(position);
+				newTaskOrder = getNewTaskOrder(task,position);
+				tempSolution = new Solution(newTaskOrder, problem);
+				int newMakespan = tempSolution.getMakespan();
 				if (newMakespan < makespan) {
 					makespan = newMakespan;
-					bestPosition=position;
-					switchedTask=task;
+					bestTaskOrder=newTaskOrder;
+					bestSolution=tempSolution;
 				}
 			}
 		}
-		applyBestPosition(bestPosition,switchedTask);
+		applyBestPosition(bestSolution);
+		//print();
 		return getMakespan();
 	}
 
-	private void applyBestPosition(Tuple bestPosition, Task switchedTask) {
-		if(bestPosition==null || switchedTask==null) {
-			// TODO nichts? 
+
+	private ArrayList<ArrayList<Task>> getNewTaskOrder(Task task, Tuple position) throws ScheduledTaskByTaskNumberException {
+		// TODO Auto-generated method stub
+		ArrayList<ArrayList<Task>> result = new ArrayList<ArrayList<Task>>();
+		
+		int i =0;
+		for (ArrayList<Task> tasks : taskOrder) {
+			result.add(new ArrayList<Task>());
+			for(Task taski : tasks) {
+				result.get(i).add(taski);
+			}
+			i++;
 		}
 		
-		/*
-		 * ScheduledMachines loeschen
-		 * 
-		 */
+		result.get(getScheduledTaskByTask(task).getMachine().getMachineNumber()).remove(task);
 		
-		taskOrder = getNewTaskOrder(bestPosition, switchedTask);
-		deleteSchedule();
-		createSchedule(taskOrder);
-			
+		result.get(position.getMachineNumber()).add(position.getPosition(), task);
 		
+		return result;
 	}
 
-	private void createSchedule(ArrayList<ArrayList<Task>> taskOrder2) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private ArrayList<ArrayList<Task>> getNewTaskOrder(Tuple bestPosition, Task switchedTask) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private void deleteSchedule() {
-		scheduledMachines = new ArrayList<ArrayList<ScheduledTask>>(problem.getMachineCount());
-		for(int i = 0; i < problem.getMachineCount(); i++) {
-			scheduledMachines.add(new ArrayList<ScheduledTask>());
+	private void applyBestPosition(Solution tempSolution) {
+		if(tempSolution==null) {
+			return;
 		}
+		this.scheduledMachines=tempSolution.getScheduledMachines();		
+		this.taskOrder=tempSolution.getTaskOrder();
 	}
 
-	private int getMakespan(Tuple position) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+
 
 	private ArrayList<Tuple> getInsertPositions(Task task) throws ScheduledTaskByTaskNumberException {
 		ArrayList<Tuple> positions = new ArrayList<Tuple>();
@@ -684,6 +749,7 @@ public class Solution {
 			}		
 		}
 		
+			
 		// Task entfernen und an neuer Position einsetzen
 		newTaskOrder.get(getScheduledTaskByTask(task).getMachine().getMachineNumber()).remove(task);
 		
@@ -698,6 +764,17 @@ public class Solution {
 		}
 		
 		if(createsLoop(newTaskOrder,position,task)) {
+			return false;
+		}
+		
+		boolean check = false;
+		for (Machine m: task.getAllowedMachines()) {
+			if(m.getMachineNumber()== position.getMachineNumber()) {
+				check=true;
+			}
+		}
+		
+		if(!check) {
 			return false;
 		}
 		

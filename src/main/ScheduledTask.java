@@ -60,15 +60,17 @@ public class ScheduledTask {
 		this.taskStartTime = taskStartTime;
 	}
 
-	public void print() {
+	public String print() {
+		String result="";
 		if(task != null && worker != null && setupStartTime != -1) {
 			int workerNumber = worker.getWorkerNumber()+1;
 			if (taskStartTime == -1) {
-				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup StartTime: "+setupStartTime);
+				result+="Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup StartTime: "+setupStartTime+System.getProperty("line.separator");
 			} else {
-				System.out.println("Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup StartTime: "+setupStartTime+" Setup EndTime: "+setupEndTime+" Task StartTime: "+taskStartTime+" Task EndTime: "+taskEndTime);
+				result+="Task: "+task.getConvertedTaskNumber()+" Worker: "+workerNumber+" Setup StartTime: "+setupStartTime+" Setup EndTime: "+setupEndTime+" Task StartTime: "+taskStartTime+" Task EndTime: "+taskEndTime+System.getProperty("line.separator");
 			}				
-		}		
+		}
+		return result;
 	}
 	
 	public int calculateTaskEndTime () {
