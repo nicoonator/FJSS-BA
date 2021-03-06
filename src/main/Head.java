@@ -12,6 +12,8 @@ import Exceptions.SetupDurationNotFoundException;
 public class Head {
 	
 	public static void main(String[] args) throws SetupDurationNotFoundException {
+				
+		
 		
 		String startTime="";
 		int makespan1=0;
@@ -28,7 +30,7 @@ public class Head {
 		String result="";
 		String data="";
 
-		for(int problems = 2000; problems<3000;problems++) {
+		for(int problems = 0; problems<1000;problems++) {
 			problem=createProblem(problems);
 			System.out.println(problems);
 			/*if(problems==2003) {
@@ -59,20 +61,20 @@ public class Head {
 				
 				
 				System.out.println(startTime+","+Integer.toString(makespan1)+","+Integer.toString(makespan2)+","+endTime+System.getProperty("line.separator"));
-				data+=startTime+","+makespan1+","+makespan2+","+endTime+"\n";
+				data+=problems+","+startTime+","+makespan1+","+makespan2+","+endTime+"\n";
 				
 			} catch ( ScheduledTaskByTaskNumberException e) {
 				System.out.println(e.getMessage());
 			} 
 			
-			//System.out.println(result);
+		//	System.out.println(result);
 			
 		}
 		
 		
-		
+	
 		try {
-			writeToFile(data);
+			writeToFile(data,"Small");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -81,6 +83,8 @@ public class Head {
 		
 	}
 	
+
+
 	private static ProblemDetails createProblem(int problems) {
 		// TODO Auto-generated method stub
 		if (problems<1000) {
@@ -382,9 +386,9 @@ public class Head {
 		}
 
 
-	public static void writeToFile(String data) 
+	public static void writeToFile(String data, String string) 
 			  throws IOException {
-			    FileWriter fileWriter = new FileWriter("Files/result3.txt");
+			    FileWriter fileWriter = new FileWriter("Results/result"+string+".txt");
 			    PrintWriter printWriter = new PrintWriter(fileWriter);
 			    printWriter.print(data);
 			    printWriter.close();

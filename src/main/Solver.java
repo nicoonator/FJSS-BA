@@ -1,5 +1,7 @@
 package main;
 
+import java.util.ArrayList;
+
 import Exceptions.ScheduledTaskByTaskNumberException;
 import Exceptions.SetupDurationNotFoundException;
 
@@ -23,22 +25,61 @@ public class Solver {
 
 		solution = new Solution(initialSolution);
 		localSearch();
+//		tabuSearch();
 		return solution;
 	}
 
 	private void localSearch() throws ScheduledTaskByTaskNumberException, SetupDurationNotFoundException {
 		// TODO Auto-generated method stub
+		ArrayList<ArrayList<ArrayList<Task>>> tabuList= new ArrayList<ArrayList<ArrayList<Task>>>();
+		Solution temp;
 		int makespan = solution.getMakespan();
 		boolean check = true;
 		while (check) {
 			check = false;
-			int makespan2 = solution.findBestNeighbor();
+			temp = solution.findBestNeighbor(tabuList);
+			int makespan2=temp.getMakespan();
 			if(makespan2<makespan) {
 				check=true;
 				makespan = makespan2;
 			}
 		}
 	}
+	
+	/*
+	 * private void tabuSearch() throws ScheduledTaskByTaskNumberException,
+	 * SetupDurationNotFoundException { // TODO Auto-generated method stub
+	 * ArrayList<ArrayList<ArrayList<Task>>> tabuList= new
+	 * ArrayList<ArrayList<ArrayList<Task>>>(); Solution temp;
+	 * ArrayList<ArrayList<Task>> tempTaskOrder = new ArrayList<ArrayList<Task>>();
+	 * 
+	 * for(int m = 0; m < solution.getProblem().getMachineCount();m++) {
+	 * tempTaskOrder.add(new ArrayList<Task>()); }
+	 * 
+	 * ArrayList<ArrayList<Task>> emptyTaskOrder = new ArrayList<ArrayList<Task>>();
+	 * 
+	 * 
+	 * int makespan = solution.getMakespan(); boolean check = true; while (check) {
+	 * check = false; temp = solution.findBestNeighbor(tabuList); for (int i = 0; i
+	 * < temp.getTaskOrder().size(); i++) { for (int j = 0; j <
+	 * temp.getTaskOrder().get(i).size(); j++) {
+	 * tempTaskOrder.get(i).add(temp.getTaskOrder().get(i).get(j)); } } int
+	 * makespan2=temp.getMakespan(); if(!isInTabuList(temp,tabuList)) { check=true;
+	 * for(int m = 0; m < solution.getProblem().getMachineCount();m++) {
+	 * emptyTaskOrder.add(new ArrayList<Task>()); } tabuList.add(emptyTaskOrder);
+	 * for (int i = 0; i < tempTaskOrder.size(); i++) { for (int j = 0; j <
+	 * tempTaskOrder.get(i).size(); j++) {
+	 * tabuList.get(tabuList.size()-1).get(i).add(tempTaskOrder.get(i).get(j)); } }
+	 * if(tabuList.size()>10) { check=false; } makespan = makespan2; } } }
+	 * 
+	 * private boolean isInTabuList(Solution temp,
+	 * ArrayList<ArrayList<ArrayList<Task>>> tabuList) {
+	 * 
+	 * for(ArrayList<ArrayList<Task>> taskOrder : tabuList) { if
+	 * (taskOrder==temp.getTaskOrder()) { return true; } }
+	 * 
+	 * return false; }
+	 */
 
 	public Solution createInitialSolution(ProblemDetails problem) throws SetupDurationNotFoundException, ScheduledTaskByTaskNumberException {
 		Solution result = new Solution(problem);

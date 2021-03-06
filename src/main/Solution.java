@@ -652,10 +652,15 @@ public class Solution {
 		this.taskOrder = taskOrder;
 	}
 
-	public int findBestNeighbor() throws ScheduledTaskByTaskNumberException, SetupDurationNotFoundException {
+	public Solution findBestNeighbor(ArrayList<ArrayList<ArrayList<Task>>> tabuList) throws ScheduledTaskByTaskNumberException, SetupDurationNotFoundException {
+		
+		if(!tabuList.isEmpty()) {
+			//TODO
+		}
+		
 		int makespan = getMakespan();
 		Solution tempSolution =null;
-		Solution bestSolution =null;
+		Solution bestSolution =this;
 		for (Task task : getCriticalTasks()) {
 			for (Tuple position : getInsertPositions(task)) {
 				newTaskOrder = getNewTaskOrder(task,position);
@@ -669,7 +674,7 @@ public class Solution {
 		}
 		applyBestPosition(bestSolution);
 		//print();
-		return getMakespan();
+		return bestSolution;
 	}
 
 
