@@ -5,7 +5,6 @@ import Exceptions.SetupDurationNotFoundException;
 
 public class Solver {
 	
-	Solution initialSolution;
 	Solution solution;
 
 	/* Notwenige Funktionen:
@@ -14,7 +13,7 @@ public class Solver {
 	 */
 	
 
-	public Solution useHeuristik() throws ScheduledTaskByTaskNumberException, SetupDurationNotFoundException {
+	public Solution useHeuristik(Solution initialSolution) throws ScheduledTaskByTaskNumberException, SetupDurationNotFoundException {
 		//TODO
 				
 		// Extrahiere Taskreihenfolge aus Initial Solution (Teilweise unabhaengig vom Worker) (in Solution als neue Variable?)
@@ -42,7 +41,7 @@ public class Solver {
 	}
 
 	public Solution createInitialSolution(ProblemDetails problem) throws SetupDurationNotFoundException, ScheduledTaskByTaskNumberException {
-		Solution solution = new Solution(problem);
+		Solution result = new Solution(problem);
 		//ArrayList<Task> remainingTasks = getRemainingTasks(solution);
 		//ArrayList<Task> assignableTasks = solution.getAssignableTasks();
 		
@@ -54,16 +53,16 @@ public class Solver {
 		*/
 		
 		
-		while (!solution.getRemainingTasks().isEmpty()) {
-			Task t = solution.getNextTask();
-			Machine m = solution.getNextMachine(t);
-			Worker w = solution.getNextWorker(t,m);
+		while (!result.getRemainingTasks().isEmpty()) {
+			Task t = result.getNextTask();
+			Machine m = result.getNextMachine(t);
+			Worker w = result.getNextWorker(t,m);
 
-			solution.addScheduledTask(t,m,w);
+			result.addScheduledTask(t,m,w);
 		}
 		
-		initialSolution=solution;
-		return initialSolution;
+		
+		return result;
 	}
 
 	

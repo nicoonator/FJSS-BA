@@ -13,6 +13,11 @@ public class Head {
 	
 	public static void main(String[] args) throws SetupDurationNotFoundException {
 		
+		String startTime="";
+		int makespan1=0;
+		int makespan2=0;
+		String endTime="";
+		
 		InstanceReader instanceReader = new InstanceReader();
 		Solver solver = new Solver();
 					
@@ -23,44 +28,48 @@ public class Head {
 		String result="";
 		String data="";
 
-		for(int problems =2000; problems<3000;problems++) {
+		for(int problems = 2000; problems<3000;problems++) {
 			problem=createProblem(problems);
-		
+			System.out.println(problems);
 			/*if(problems==2003) {
 				System.out.println("Test");
 			}*/
-		
-		try {
-			data+= new SimpleDateFormat("HH:mm:ss").format(new Date());
-			data+=",";
-			Solution initialSolution = solver.createInitialSolution(problem);
-			result+="This is the initial Solution:";
-			//result+=initialSolution.print()+System.getProperty("line.separator")+System.getProperty("line.separator");
-			data+=initialSolution.getMakespan();
-			result+=initialSolution.getMakespan()+System.getProperty("line.separator");
-			data+=",";
-			//result.concat(System.getProperty("line.separator"));
+			result="";
 			
-			Solution finalSolution = solver.useHeuristik();
-			result+="This is the final Solution:";
-			//result+=finalSolution.print()+System.getProperty("line.separator");
-			data+=finalSolution.getMakespan();
-			result+=finalSolution.getMakespan();
-					
-			data+=",";
-			data+= new SimpleDateFormat("HH:mm:ss").format(new Date());
+			try {
+				
+				startTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
+				
+				Solution initialSolution = solver.createInitialSolution(problem);
+				result+="This is the initial Solution: ";
+				result+=initialSolution.print()+System.getProperty("line.separator")+System.getProperty("line.separator");
+				makespan1=initialSolution.getMakespan();
+				result+=initialSolution.getMakespan()+"\n";
+				
+				System.out.println(Integer.toString(makespan1));
+				
+				Solution finalSolution = solver.useHeuristik(initialSolution);
+				result+="This is the final Solution: ";
+				result+=finalSolution.print()+System.getProperty("line.separator");
+				makespan2=finalSolution.getMakespan();
+				result+=finalSolution.getMakespan()+"\n";
+						
+				
+				endTime= new SimpleDateFormat("HH:mm:ss").format(new Date());
+				
+				
+				System.out.println(startTime+","+Integer.toString(makespan1)+","+Integer.toString(makespan2)+","+endTime+System.getProperty("line.separator"));
+				data+=startTime+","+makespan1+","+makespan2+","+endTime+"\n";
+				
+			} catch ( ScheduledTaskByTaskNumberException e) {
+				System.out.println(e.getMessage());
+			} 
 			
+			//System.out.println(result);
 			
-			data+=System.getProperty("line.separator");
-			
-			
-		} catch ( ScheduledTaskByTaskNumberException e) {
-			System.out.println(e.getMessage());
-		} 
-		
-		System.out.println(result);
-		System.out.println(problems);
 		}
+		
+		
 		
 		try {
 			writeToFile(data);
@@ -200,7 +209,7 @@ public class Head {
 		// TODO Auto-generated method stub
 		
 		//TODO
-		int q=0;
+		
 		
 		
 		//init

@@ -505,7 +505,7 @@ public class Solution {
 		 * Job mit most Work Remaining bestimmen
 		 * Assignable Task dieses Jobs returnen
 		 */
-		int i = 2;
+		int i = 1;
 		Job job = null;
 				
 		switch (i) {
