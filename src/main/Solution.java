@@ -44,7 +44,7 @@ public class Solution {
 		while (!getRemainingTasks().isEmpty()) {
 			Task t = getNextTask(taskOrder);
 			Machine m = getMachineByTask(t);
-			//DEFAULT WORKER SEARCH
+			//New WORKER SEARCH
 			Worker w = getNextWorker(t,m);
 
 			addScheduledTask(t,m,w);
@@ -383,6 +383,35 @@ public class Solution {
 
 	public Worker getNextWorker(Task t, Machine m) {
 		/*
+		 * Returns first FREE (non-overlapping) Worker who is allowed to setup machine m with smallest setup time
+		 */
+		ArrayList<Worker> workerList = getWorkerswithEarliestAssignmentTime(m.getAllowedWorkers(), getWorkerwithEarliestAssignmentTime(m.getAllowedWorkers()));
+		int setupTime=-1;
+		Worker result = workerList.get(0);
+		
+		for (Worker w: workerList) {
+			for (Map.Entry<Constellation, Integer> entry : t.getSetupTimes().entrySet()) {
+				Constellation tempConstellation = entry.getKey();
+				if (tempConstellation.getMachine() == m && tempConstellation.getWorker()==w) {
+					if (tempConstellation.getPredecessor() == getPredecessor(m)) {
+						if (setupTime == -1) {
+							result = w;
+							setupTime = entry.getValue();
+						}
+						if (setupTime > entry.getValue()) {
+							result = w;
+							setupTime = entry.getValue();
+						} 
+					}
+				}
+			} 
+		}
+		//get Worker with earliestAssignmentTime
+		return result;
+	}
+	
+	public Worker getNextWorkerInitial(Task t, Machine m) {
+		/*
 		 * Returns first FREE (non-overlapping) Worker who is allowed to setup machine m
 		 */
 		
@@ -391,6 +420,19 @@ public class Solution {
 		return getWorkerwithEarliestAssignmentTime(m.getAllowedWorkers());
 	}
 
+
+	private ArrayList<Worker> getWorkerswithEarliestAssignmentTime(ArrayList<Worker> allowedWorkers,
+			Worker workerwithEarliestAssignmentTime) {
+		ArrayList<Worker> result = new ArrayList<Worker>();
+		int earliestAssignmentTime=getEarliestAssignmentTime(workerwithEarliestAssignmentTime);
+		for(Worker w : allowedWorkers) {
+			if(getEarliestAssignmentTime(w)==earliestAssignmentTime) {
+				result.add(w);
+			}
+		}
+		
+		return result;
+	}
 
 	private Worker getWorkerwithEarliestAssignmentTime(ArrayList<Worker> workers) {
 		Worker result = workers.get(0);
@@ -655,14 +697,19 @@ public class Solution {
 	public Solution findBestNeighbor(ArrayList<ArrayList<ArrayList<Task>>> tabuList) throws ScheduledTaskByTaskNumberException, SetupDurationNotFoundException {
 		
 		if(!tabuList.isEmpty()) {
-			//TODO
+			//TODO if TabuSearch needs to be implemented
 		}
 		
 		int makespan = getMakespan();
 		Solution tempSolution =null;
 		Solution bestSolution =this;
-		for (Task task : getCriticalTasks()) {
-			for (Tuple position : getInsertPositions(task)) {
+		ArrayList<Task> criticalTasks =getCriticalTasks();
+//		int i = 0;
+		for (Task task : criticalTasks) {
+			ArrayList<Tuple> positions =getInsertPositions(task);
+			for (Tuple position : positions) {
+//				System.out.println(i);
+//				i++;
 				newTaskOrder = getNewTaskOrder(task,position);
 				tempSolution = new Solution(newTaskOrder, problem);
 				int newMakespan = tempSolution.getMakespan();
@@ -715,7 +762,7 @@ public class Solution {
 		 * getAllPossible Positions
 		 * For each Possible Position Check Viable
 		 */
-		positions = getAllInsertPositions();
+		positions = getAllInsertPositions(task);
 		for (Tuple position : positions) {
 			if(!isViablePosition(position, task)) {
 				temp.add(position);
@@ -765,16 +812,16 @@ public class Solution {
 			return false;
 		}
 		
-		boolean check = false;
-		for (Machine m: task.getAllowedMachines()) {
-			if(m.getMachineNumber()== position.getMachineNumber()) {
-				check=true;
-			}
-		}
-		
-		if(!check) {
-			return false;
-		}
+//		boolean check = false;
+//		for (Machine m: task.getAllowedMachines()) {
+//			if(m.getMachineNumber()== position.getMachineNumber()) {
+//				check=true;
+//			}
+//		}
+//		
+//		if(!check) {
+//			return false;
+//		}
 		
 		return true;
 	}
@@ -927,16 +974,19 @@ public class Solution {
 		return result;
 	}
 
-	private ArrayList<Tuple> getAllInsertPositions() {
+	private ArrayList<Tuple> getAllInsertPositions(Task task ) {
 		ArrayList<Tuple> positions = new ArrayList<Tuple>();
 		int machineCount = 0;
 		int position = 0;
 		for(ArrayList<ScheduledTask> machine : scheduledMachines) {
-			positions.add(new Tuple(machineCount,position));
-			position++;
-			for(@SuppressWarnings("unused") ScheduledTask task : machine) {
-				positions.add(new Tuple(machineCount,position));
+			if (checkMachine(machineCount, task)) {
+				positions.add(new Tuple(machineCount, position));
 				position++;
+				for (@SuppressWarnings("unused")
+				ScheduledTask ScheduledTask : machine) {
+					positions.add(new Tuple(machineCount, position));
+					position++;
+				} 
 			}
 			position=0;
 			machineCount++;
@@ -945,6 +995,29 @@ public class Solution {
 		return positions;
 	}
 
+	private boolean checkMachine(int machineCount, Task task) {
+		for(Machine m:task.getAllowedMachines()) {
+			if (m.getMachineNumber()==machineCount) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+//	Task bestimmeNächstenKritischenTask(Task lastCriticalTask) {
+//		
+//		 if (EndeDerRüstzeit(lastCriticalTask) != BeginnDerBearbeitungszeit(lastCriticalTask)) {
+//			return Vorgängertask im selben Job;
+//		} else if (BeginnDerRüstzeit(lastCriticalTask) == 0) {
+//			return null;
+//		} else if (BeginnDerRüstzeit(lastCriticalTask) == EndeDerBearbeitungszeit(VorherAufDerMaschineBearbeiteterTask(lastCriticalTask))) {
+//			return Task der Vorher auf der Maschine bearbeitetet wurde;
+//		} else {
+//			return Zuvor durch den selben Einrichter Bearbeitete Task;
+//		}
+//		
+//	}
+	
 	private ArrayList<Task> getCriticalTasks() throws ScheduledTaskByTaskNumberException {
 		ArrayList<Task> result = new ArrayList<Task>();
 		int makespan = getMakespan();

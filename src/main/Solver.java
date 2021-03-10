@@ -97,7 +97,7 @@ public class Solver {
 		while (!result.getRemainingTasks().isEmpty()) {
 			Task t = result.getNextTask();
 			Machine m = result.getNextMachine(t);
-			Worker w = result.getNextWorker(t,m);
+			Worker w = result.getNextWorkerInitial(t,m);
 
 			result.addScheduledTask(t,m,w);
 		}
